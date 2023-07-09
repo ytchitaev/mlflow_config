@@ -1,6 +1,7 @@
 from sklearn import metrics
 from enum import Enum, auto
-
+from sklearn.metrics import mean_squared_error
+from math import sqrt
 
 class AverageTypes(Enum):
     MICRO = 'micro'
@@ -21,6 +22,9 @@ def calculate_metric(model, X_validation, y_validation, X_test, y_test, metric_n
     elif metric_name == 'f1':
         def metric_func(y_true, y_pred): return metrics.f1_score(
             y_true, y_pred, average=average)
+    elif metric_name == 'rmse':
+        def metric_func(y_true, y_pred): return sqrt(mean_squared_error(
+            y_true, y_pred))  
     else:
         raise ValueError(f"Unsupported metric: {metric_name}")
 

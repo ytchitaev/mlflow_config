@@ -162,4 +162,5 @@ cython_debug/
 ###############
 
 /mlruns
+/local
 files_content.txt

@@ -1,29 +1,43 @@
-import lightgbm as lgb
-from sklearn.model_selection import train_test_split, GridSearchCV
+from abc import ABC, abstractmethod
+from typing import Dict, Any
+from lightgbm import LGBMClassifier, LGBMRegressor, LGBMRanker
 
+class Model(ABC):
+    @abstractmethod
+    def create(self, params: Dict[str, Any]) -> Any:
+        pass
 
-def instantiate_model(libary_name, model_name, params={}):
-    if libary_name == 'lightgbm':
-        if model_name == 'LGBMClassifier':
-            model = lgb.LGBMClassifier(**params)
-        elif model_name == 'LGBMRegressor':
-            model = lgb.LGBMRegressor(**params)
-        elif model_name == 'LGBMRanker':
-            model = lgb.LGBMRanker(**params)
-    else:
-        raise ValueError(f"Unsupported libary_name: {libary_name} - model name: {model_name}")
-    return model
+class LGBMClassifierModel(Model):
+    def create(self, params: Dict[str, Any]) -> Any:
+        return LGBMClassifier(**params)
 
+class LGBMRegressorModel(Model):
+    def create(self, params: Dict[str, Any]) -> Any:
+        return LGBMRegressor(**params)
 
-def split_dataset(X_input, y_input, train_percentage, validation_percentage, test_percentage):
-    X_train, X_remaining, y_train, y_remaining = train_test_split(
-        X_input, y_input, test_size=(validation_percentage + test_percentage) / 100, random_state=42)
-    X_validation, X_test, y_validation, y_test = train_test_split(
-        X_remaining, y_remaining, test_size=test_percentage / (validation_percentage + test_percentage), random_state=42)
-    return X_train, X_validation, X_test, y_train, y_validation, y_test
+class LGBMRankerModel(Model):
+    def create(self, params: Dict[str, Any]) -> Any:
+        return LGBMRanker(**params)
 
+MODELS = {
+    ("lightgbm", "LGBMClassifier"): LGBMClassifierModel(),
+    ("lightgbm", "LGBMRegressor"): LGBMRegressorModel(),
+    ("lightgbm", "LGBMRanker"): LGBMRankerModel(),
+    # Add more models as needed...
+}
 
-def perform_grid_search(model, X_train, y_train, param_grid, cv):
-    grid_search = GridSearchCV(model, param_grid, cv=cv)
-    grid_search.fit(X_train, y_train)
-    return grid_search
+def create_model(library_name: str, model_name: str, params: Dict[str, Any]) -> Any:
+    model_creator = MODELS.get((library_name, model_name))
+    if model_creator is None:
+        raise ValueError(f"Unsupported library name: {library_name} - model name: {model_name}")
+    return model_creator.create(params)
+
+## usage example
+#def main():
+#    factory = ModelFactory()
+#    factory.register_model('LGBMClassifier', LGBMClassifierModel())
+#    factory.register_model('LGBMRegressor', LGBMRegressorModel())
+#    factory.register_model('LGBMRanker', LGBMRankerModel())
+#
+#if __name__ == "__main__":
+#    main()

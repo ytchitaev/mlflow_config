@@ -1,8 +1,10 @@
 {
   "setup": {
-    "experiment_name": "Iris sklearn categorisation",
+    "experiment_name": "Wine sklearn regression",
+    "data_source": "sklearn",
+    "dataset_name": "wine",
     "library_name": "lightgbm",
-    "model_name": "LGBMClassifier",
+    "model_name": "LGBMRegressor",
     "verbose_fit_flag": "1",
     "paths": {
       "run_temp_folder": "temp"
@@ -24,24 +26,12 @@
   "grid_search": {
     "param_grid": {
       "boosting_type": [
-        "gbdt",
-        "dart"
+        "gbdt"
       ],
-      "num_leaves": [
-        15,
-        31,
-        150
-      ],
-      "learning_rate": [
-        0.01,
-        0.05,
-        0.5
-      ],
-      "n_estimators": [
-        50,
-        100,
-        300
-      ]
+      "num_leaves": [20, 30, 40],
+      "learning_rate": [0.01, 0.05, 0.1],
+      "feature_fraction": [0.8, 0.9, 1.0],
+      "bagging_fraction": [0.7, 0.8, 0.9]
     },
     "cv": 3
   }

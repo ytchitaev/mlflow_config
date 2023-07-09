@@ -5,11 +5,18 @@
 - Show example of how to integrate with databricks, not just run it locally
 
 # To do
-- verbose_fit_flag is not used
-- grid search is only one example of hyperparamter tuning, maybe move in tuning_runner 
-- data_loader doesn't have handling for how to select features columns and prediction column for non sklearn
-- evaluate model component could be driven by metadata json, mlflow.log_metric could be dynamic based on evaluate model variables created (or also from metadata listing of evaluate for validate and test)
-- Could potentially convert to classes, ask cgpt for suggestions on this
+- [ ] verbose_fit_flag is not used
+- [ ] evaluate model component could be driven by metadata json, 
+- [ ] mlflow.log_metric could be dynamic based on evaluate model variables created (or also from metadata listing of evaluate for validate and test)
+- [ ] bagging warning for regression - https://chat.openai.com/share/9ced9df8-9e17-40bb-85c1-942007711419
+- [ ] data_loader doesn't have handling for how to select features columns and prediction column for non sklearn
+- [ ] grid search is only one example of hyperparamter tuning, maybe move in tuning_runner 
+- [ ] Could potentially convert to classes, ask cgpt for suggestions on this
+- [ ] Port over diagram drawing of gradient boosted tree
+- [ ] Research how to plot data over time in mlflow, watch some videos
+- [ ] Port over plotting evaluation metrics on sample or should that be visible on mlflow?
+- [ ] Port over plotting cv_results or should that be visible in mflow?
+- [ ] Best practice for sampling model predictions, maybe web ui or can mlflow do it?
 
 # Notes
 - mlflow ui to launch

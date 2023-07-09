@@ -1,17 +1,24 @@
 import json
+from pathlib import Path
 
-
-def load_json(file_name: str):
-    with open(file_name, 'r') as f:
+def load_json(path: str):
+    with open(path, 'r') as f:
         return json.load(f)
 
+def get_config_dir(file_name: str):
+    "navigate up from functions down to configs"
+    config_dir = Path(__file__).parent.parent / 'configs'
+    return config_dir / file_name
 
-def load_configurations(config_file: str):
-    config = load_json(config_file)
+def load_configurations(config_file_name: str):
+    config_path = get_config_dir(config_file_name)
+    config = load_json(config_path)
     configurations = {
         # root
         'setup': config.get('setup', {}),
         # setup
+        'data_source': config.get('setup', {}).get('data_source', {}),
+        'dataset_name': config.get('setup', {}).get('dataset_name', {}),    
         'library_name': config.get('setup', {}).get('library_name', {}),
         'model_name': config.get('setup', {}).get('model_name', {}),
         # 'verbose_fit_flag': config.get('setup', {}).get('verbose_fit_flag', '0'),
