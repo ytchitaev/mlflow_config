@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Grant execute permissions
+        run: chmod +x -R ./.github/scripts/
+        
       - name: Unit tests
         run: ./.github/scripts/run_unit_tests.sh
 
