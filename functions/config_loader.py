@@ -22,6 +22,8 @@ def load_configurations(config_file_name: str):
         'library_name': config.get('setup', {}).get('library_name', {}),
         'model_name': config.get('setup', {}).get('model_name', {}),
         # 'verbose_fit_flag': config.get('setup', {}).get('verbose_fit_flag', '0'),
+        'input_columns': config.get('setup', {}).get('input_columns', {}),
+        'output_columns': config.get('setup', {}).get('output_columns', {}),
         # name
         'experiment_name': config.get('setup', {}).get('experiment_name', 'Default'),
         # split

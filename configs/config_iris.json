@@ -6,6 +6,15 @@
     "library_name": "lightgbm",
     "model_name": "LGBMClassifier",
     "verbose_fit_flag": "1",
+    "input_columns": [
+      "sepal length (cm)",
+      "sepal width (cm)",
+      "petal length (cm)",
+      "petal width (cm)"
+    ],
+    "output_columns": [
+      "class"
+    ],
     "paths": {
       "run_temp_folder": "temp"
     },
@@ -14,7 +23,7 @@
         "file_name": "cv_results.csv"
       },
       "python_logging": {
-        "file_name" : "python_logging.txt"
+        "file_name": "python_logging.txt"
       }
     },
     "split": {

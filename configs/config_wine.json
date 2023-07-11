@@ -6,6 +6,24 @@
     "library_name": "lightgbm",
     "model_name": "LGBMRegressor",
     "verbose_fit_flag": "1",
+    "input_columns": [
+      "alcohol",
+      "malic_acid",
+      "ash",
+      "alcalinity_of_ash",
+      "magnesium",
+      "total_phenols",
+      "flavanoids",
+      "nonflavanoid_phenols",
+      "proanthocyanins",
+      "color_intensity",
+      "hue",
+      "od280/od315_of_diluted_wines",
+      "proline"
+    ],
+    "output_columns": [
+      "cultivar"
+    ],
     "paths": {
       "run_temp_folder": "temp"
     },
@@ -14,7 +32,7 @@
         "file_name": "cv_results.csv"
       },
       "python_logging": {
-        "file_name" : "python_logging.txt"
+        "file_name": "python_logging.txt"
       }
     },
     "split": {
@@ -28,10 +46,26 @@
       "boosting_type": [
         "gbdt"
       ],
-      "num_leaves": [20, 30, 40],
-      "learning_rate": [0.01, 0.05, 0.1],
-      "feature_fraction": [0.8, 0.9, 1.0],
-      "bagging_fraction": [0.7, 0.8, 0.9]
+      "num_leaves": [
+        20,
+        30,
+        40
+      ],
+      "learning_rate": [
+        0.01,
+        0.05,
+        0.1
+      ],
+      "feature_fraction": [
+        0.8,
+        0.9,
+        1.0
+      ],
+      "bagging_fraction": [
+        0.7,
+        0.8,
+        0.9
+      ]
     },
     "cv": 3
   }

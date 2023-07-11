@@ -1,0 +1,1 @@
+mlflow models serve --model-uri runs:/10b0eb1c483642f0a302b4586a02881d/model -h localhost -p 5001

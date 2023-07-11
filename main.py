@@ -1,5 +1,7 @@
 import os
 import argparse
+import traceback
+
 import mlflow
 import mlflow.lightgbm
 import lightgbm as lgb
@@ -28,13 +30,13 @@ def main(config_file):
             run_id = run.info.run_id
             experiment_id = run.info.experiment_id
             experiment_run_path = os.path.join("mlruns", experiment_id, run_id)
+            model_path = os.path.join("mlruns", experiment_id, run_id, "artifacts/model/model.pkl")
             logger, file_handler_path = instantiate_python_logger(
                 experiment_run_path,
                 configs['run_temp_folder'],
                 configs['python_logging_file_name'])
             logger.info("Running mlflow...")
-            logger.info(
-                f"Started mlruns/{{experiment}}/{{run}}/ path: {experiment_run_path}")
+            logger.info(f"Started run: {experiment_run_path}")
 
             # Log the config parameters
             mlflow.log_params(configs['setup'])
@@ -44,6 +46,7 @@ def main(config_file):
             logger.info("Loading data...")
             X_input, y_input = load_data(
                 data_source=configs['data_source'], 
+                column_names=(configs['input_columns'],configs['output_columns']),
                 dataset_name=configs['dataset_name'])
 
             # Split data
@@ -98,9 +101,11 @@ def main(config_file):
                 best_model, X_validation, y_validation, X_test, y_test, 'rmse'
             )
 
-            # Log model, parameters and artifacts
+            # Log model, column names, parameters and artifacts
             logger.info("Logging model, parameters and artifacts...")
             mlflow.lightgbm.log_model(best_model, "model")
+            mlflow.log_param("input_columns", configs['input_columns'])
+            mlflow.log_param("output_columns", configs['output_columns'])
             mlflow.log_params(best_params)
             mlflow_log_artifact_cv_results(
                 experiment_id, run_id,
@@ -123,17 +128,20 @@ def main(config_file):
 
         except Exception as e:
             logger.error(f"Exception occurred during model training: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             mlflow.log_param("status", "FAILED")
             mlflow.log_artifact(file_handler_path)
             logger.info(
-                f"Finished mlruns/{{experiment}}/{{run}}/ path: {experiment_run_path}")
+                f"Finished run: {experiment_run_path}")
 
         else:
-            logger.info("Model training completed successfully.")
             mlflow.log_param("status", "SUCCESS")
             mlflow.log_artifact(file_handler_path)
-            logger.info(
-                f"Finished mlruns/{{experiment}}/{{run}}/ path: {experiment_run_path}")
+            logger.info("Model training completed successfully.")
+            logger.info(f"Finished run: {experiment_run_path}")
+            logger.info(f"Input columns: {', '.join(configs['input_columns'])}")
+            logger.info(f"Output columns: {', '.join(configs['output_columns'])}")
+            logger.info(f"Model - full path:{model_path}")
 
 
 if __name__ == "__main__":
