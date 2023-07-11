@@ -18,14 +18,13 @@ from functions.evaluation_metrics import calculate_metric
 
 
 def main(config_file):
-    # Parse CLI args
-    #configs = load_configurations(config_file)
-    configs = load_configurations(config_file, MAPPING_SPECIFICATION)
 
+    # Parse CLI args
+    configs = load_configurations(config_file, MAPPING_SPECIFICATION)
     # Define experiment name
     mlflow.set_experiment(configs['setup.experiment_name'])
-
     # Start an MLflow run
+
     with mlflow.start_run() as run:
 
         try:
@@ -37,7 +36,8 @@ def main(config_file):
             logger, file_handler_path = instantiate_python_logger(
                 experiment_run_path,
                 configs['setup.paths.run_temp_folder'],
-                configs['setup.artefacts.python_logging.file_name'])
+                configs['setup.artefacts.python_logging.file_name']
+            )
             logger.info("Running mlflow...")
             logger.info(f"Started run: {experiment_run_path}")
 
@@ -69,17 +69,25 @@ def main(config_file):
             # Run grid search
             logger.info("Running grid search...")
             grid_search = perform_grid_search(
-                model, X_train, y_train, configs['grid_search.param_grid'], configs['grid_search.cv'])
+                model, 
+                X_train, 
+                y_train, 
+                configs['grid_search.param_grid'], 
+                configs['grid_search.cv']
+            )
 
             # Get best model values from grid search
             best_params = grid_search.best_params_
             cv_results = grid_search.cv_results_
 
             # Train the model with the best parameters
-            logger.info(
-                "Training model with best parameters from grid search...")
+            logger.info("Training model with best parameters from grid search...")
             best_model = create_model(
-                configs['setup.library_name'], configs['setup.model_name'], best_params)
+                configs['setup.library_name'], 
+                configs['setup.model_name'], 
+                best_params
+            )
+            
             best_model.fit(
                 X_train,
                 y_train,
@@ -88,21 +96,11 @@ def main(config_file):
 
             # Evaluate model
             logger.info("Evaluating model...")
-            #validation_accuracy, test_accuracy = calculate_metric(
-            #    best_model, X_validation, y_validation, X_test, y_test, 'accuracy',
-            #)
-            #validation_precision, test_precision = calculate_metric(
-            #    best_model, X_validation, y_validation, X_test, y_test, 'precision', average='macro'
-            #)
-            #validation_recall, test_recall = calculate_metric(
-            #    best_model, X_validation, y_validation, X_test, y_test, 'recall', average='macro'
-            #)
-            #validation_f1, test_f1 = calculate_metric(
-            #    best_model, X_validation, y_validation, X_test, y_test, 'f1', average='macro'
-            #)
-            validation_rmse, test_rmse = calculate_metric(
-                best_model, X_validation, y_validation, X_test, y_test, 'rmse'
-            )
+            #validation_accuracy, test_accuracy = calculate_metric(best_model, X_validation, y_validation, X_test, y_test, 'accuracy')
+            #validation_precision, test_precision = calculate_metric(best_model, X_validation, y_validation, X_test, y_test, 'precision', average='macro')
+            #validation_recall, test_recall = calculate_metric(best_model, X_validation, y_validation, X_test, y_test, 'recall', average='macro')
+            #validation_f1, test_f1 = calculate_metric(best_model, X_validation, y_validation, X_test, y_test, 'f1', average='macro')
+            validation_rmse, test_rmse = calculate_metric(best_model, X_validation, y_validation, X_test, y_test, 'rmse')
 
             # Log model, column names, parameters and artifacts
             logger.info("Logging model, parameters and artifacts...")
@@ -111,12 +109,14 @@ def main(config_file):
             mlflow.log_param("output_columns", configs['setup.output_columns'])
             mlflow.log_params(best_params)
             mlflow_log_artifact_cv_results(
-                experiment_id, run_id,
+                experiment_id, 
+                run_id,
                 configs['setup.paths.run_temp_folder'],
                 configs['setup.artefacts.cv_results.file_name'],
-                cv_results)
+                cv_results
+            )
 
-            # Log evals
+            # Log evaluations
             logger.info("Logging evaluations...")
             #mlflow.log_metric("validation_accuracy", validation_accuracy)
             #mlflow.log_metric("test_accuracy", test_accuracy)
