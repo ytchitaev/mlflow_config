@@ -1,0 +1,31 @@
+name: Pull Request Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: ./.github/scripts/run_unit_tests
+
+      - name: Functional test - categorisation
+        run: ./.github/scripts/run_categorisation
+
+      - name: Functional test - regression
+        run: ./.github/scripts/run_regression
