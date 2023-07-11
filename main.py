@@ -46,9 +46,10 @@ def main(config_file):
             logger.info("Loading data...")
             X_input, y_input = load_data(
                 data_source=configs['data_source'], 
-                column_names=(configs['input_columns'],configs['output_columns']),
-                dataset_name=configs['dataset_name'])
-
+                dataset_name=configs['dataset_name'],
+                input_columns=configs['input_columns'],
+                output_columns=configs['output_columns']
+            )
             # Split data
             logger.info("Splitting data...")
             X_train, X_validation, X_test, y_train, y_validation, y_test = split_dataset(
