@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import mlflow
 import logging
+import json
 
 class StreamToLogger(object):
     """
@@ -46,11 +47,20 @@ def instantiate_python_logger(experiment_run_path, run_temp_folder, python_loggi
     return logger, file_handler_path
 
 
-def mlflow_log_artifact_cv_results(experiment_id, run_id, run_temp_folder, cv_results_file_name, cv_results):
-    cv_results_df = pd.DataFrame(cv_results)
+def mlflow_log_artifact_dict_to_csv(experiment_id, run_id, run_temp_folder, file_name, dictionary):
+    dictionary_df = pd.DataFrame(dictionary)
     temp_dir = os.path.join("mlruns", experiment_id, run_id, run_temp_folder)
     os.makedirs(temp_dir, exist_ok=True)
-    csv_path = os.path.join(temp_dir, cv_results_file_name)
-    cv_results_df.to_csv(csv_path, index=False)
+    csv_path = os.path.join(temp_dir, file_name)
+    dictionary_df.to_csv(csv_path, index=False)
     mlflow.log_artifact(csv_path)
     os.remove(csv_path)
+
+def mlflow_log_artifact_dict_to_json(experiment_id, run_id, run_temp_folder, file_name, dictionary):
+    temp_dir = os.path.join("mlruns", experiment_id, run_id, run_temp_folder)
+    os.makedirs(temp_dir, exist_ok=True)
+    json_path = os.path.join(temp_dir, file_name)
+    with open(json_path, 'w') as file:
+        json.dump(dictionary, file)
+    mlflow.log_artifact(json_path)
+    os.remove(json_path)

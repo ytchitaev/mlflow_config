@@ -4,50 +4,61 @@ import glob
 import fnmatch
 
 
-def filter_files(directory, exclude_git=False, filters=None, extension=None, recursive=False, ignore=None):
+def should_exclude_path(path, exclude_git, ignore):
+    if exclude_git and '.git' in path:
+        return True
+
+    if ignore:
+        for ignore_pattern in ignore:
+            if fnmatch.fnmatch(path, ignore_pattern):
+                return True
+
+    return False
+
+
+def is_file_filtered(file_path, filters, extension):
+    if filters:
+        for filter_pattern in filters:
+            if fnmatch.fnmatch(file_path, filter_pattern):
+                return True
+
+    if extension and not file_path.endswith(extension):
+        return True
+
+    return False
+
+
+def get_files_in_directory(directory):
+    return glob.glob(directory)
+
+
+def get_filtered_files(directory, exclude_git=False, filters=None, extension=None, ignore=None):
     filtered_files = []
 
-    if recursive:
-        for root, _, _ in os.walk(directory):
-            matching_files = glob.glob(os.path.join(root, '*'))
+    for root, _, filenames in os.walk(directory):
+        for filename in filenames:
+            file_path = os.path.join(root, filename)
 
-            for file_path in matching_files:
-                if exclude_git and '.git' in file_path:
+            if os.path.isdir(file_path):
+                continue
+
+            if exclude_git and '.git' in file_path:
+                continue
+
+            if ignore:
+                if any(fnmatch.fnmatch(file_path, pattern) for pattern in ignore):
                     continue
 
-                ignore_file = False
-                if ignore:
-                    for ignore_pattern in ignore:
-                        if fnmatch.fnmatch(file_path, os.path.join(directory, ignore_pattern)):
-                            ignore_file = True
-                            break
-
-                if ignore_file:
+            if filters:
+                if any(fnmatch.fnmatch(file_path, pattern) for pattern in filters):
+                    if extension and not file_path.endswith(extension):
+                        continue
+                else:
                     continue
+            elif extension and not file_path.endswith(extension):
+                continue
 
-                if extension is None or file_path.endswith(extension):
-                    filtered_files.append(file_path)
-    else:
-        for filter_pattern in filters:
-            filter_pattern = os.path.join(directory, filter_pattern)
-            matching_files = glob.glob(filter_pattern)
-
-            for file_path in matching_files:
-                if exclude_git and '.git' in file_path:
-                    continue
-
-                ignore_file = False
-                if ignore:
-                    for ignore_pattern in ignore:
-                        if fnmatch.fnmatch(file_path, os.path.join(directory, ignore_pattern)):
-                            ignore_file = True
-                            break
-
-                if ignore_file:
-                    continue
-
-                if extension is None or file_path.endswith(extension):
-                    filtered_files.append(file_path)
+            filtered_files.append(file_path)
 
     return filtered_files
 
@@ -102,12 +113,11 @@ parser.add_argument('--write', dest='write',
 args = parser.parse_args()
 
 # Call the function with the specified directory, flags, and extension
-filtered_files = filter_files(args.start_directory,
-                              exclude_git=args.exclude_git,
-                              filters=args.filter,
-                              extension=args.extension,
-                              recursive=args.recursive,
-                              ignore=args.ignore)
+filtered_files = get_filtered_files(args.start_directory,
+                                    exclude_git=args.exclude_git,
+                                    filters=args.filter,
+                                    extension=args.extension,
+                                    ignore=args.ignore)
 
 if args.write:
     write_files_content(filtered_files)

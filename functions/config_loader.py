@@ -39,7 +39,8 @@ def load_configurations(config_file_name: str, mapping_specification: dict):
     config_path = get_config_dir(config_file_name)
     config = load_json(config_path)
 
-    configurations = {}
+    configurations = {'': config}  # Include the root element
+
     for path, default in mapping_specification.items():
         keys = path.split('.')
         value = get_config_value(config, keys, default)
