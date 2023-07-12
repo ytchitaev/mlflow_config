@@ -18,6 +18,9 @@ jobs:
         with:
           python-version: 3.11.4
 
+      - name: Set environment variable
+        run: echo "SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
