@@ -23,7 +23,8 @@
   },
   "model": {
     "library_name": "lightgbm",
-    "model_name": "LGBMClassifier"
+    "model_name": "LGBMClassifier",
+    "callbacks": {}
   },
   "tuning": {
     "grid_search": {
@@ -52,45 +53,23 @@
     }
   },
   "evaluate": {
-    "accuracy": {
-      "split": {
-        "validation" : ["Y_test", "y_test"],
-        "test" : ["X_test", "y_test"]
-      }
-    },
+    "accuracy": {},
     "precision": {
-      "split": {
-        "validation" : ["Y_test", "y_test"],
-        "test" : ["X_test", "y_test"]
-      },
       "additional": {
         "average": "macro"
       }
     },
     "recall": {
-      "split": {
-        "validation" : ["Y_test", "y_test"],
-        "test" : ["X_test", "y_test"]
-      },
       "additional": {
         "average": "macro"
       }
     },
     "f1": {
-      "split": {
-        "validation" : ["Y_test", "y_test"],
-        "test" : ["X_test", "y_test"]
-      },
       "additional": {
         "average": "macro"
       }
     },
-    "rmse": {
-      "split": {
-        "validation" : ["Y_test", "y_test"],
-        "test" : ["X_test", "y_test"]
-      }
-    }
+    "rmse": {}
   },
   "artefacts": {
     "cv_results": {

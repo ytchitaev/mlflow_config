@@ -32,7 +32,8 @@
   },
   "model": {
     "library_name": "lightgbm",
-    "model_name": "LGBMRegressor"
+    "model_name": "LGBMRegressor",
+    "callbacks": {}
   },
   "tuning": {
     "grid_search": {
@@ -65,12 +66,7 @@
     }
   },
   "evaluate": {
-    "rmse": {
-      "split": [
-        "validation",
-        "test"
-      ]
-    }
+    "rmse": {}
   },
   "artefacts": {
     "cv_results": {
