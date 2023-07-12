@@ -1,11 +1,10 @@
 {
   "setup": {
-    "experiment_name": "Wine sklearn regression",
+    "experiment_name": "Wine sklearn regression"
+  },
+  "data": {
     "data_source": "sklearn",
     "dataset_name": "wine",
-    "library_name": "lightgbm",
-    "model_name": "LGBMRegressor",
-    "verbose_fit_flag": "1",
     "input_columns": [
       "alcohol",
       "malic_acid",
@@ -23,50 +22,55 @@
     ],
     "output_columns": [
       "cultivar"
-    ],
-    "paths": {
-      "run_temp_folder": "temp"
-    },
-    "artefacts": {
-      "cv_results": {
-        "file_name": "cv_results.csv"
+    ]
+  },
+  "split": {
+    "train_percentage": 80,
+    "validation_percentage": 10,
+    "test_percentage": 10,
+    "random_state": 42
+  },
+  "model": {
+    "library_name": "lightgbm",
+    "model_name": "LGBMRegressor",
+    "callbacks": {}
+  },
+  "tuning": {
+    "grid_search": {
+      "param_grid": {
+        "boosting_type": [
+          "gbdt"
+        ],
+        "num_leaves": [
+          20,
+          30,
+          40
+        ],
+        "learning_rate": [
+          0.01,
+          0.05,
+          0.1
+        ],
+        "feature_fraction": [
+          0.8,
+          0.9,
+          1.0
+        ],
+        "bagging_fraction": [
+          0.7,
+          0.8,
+          0.9
+        ]
       },
-      "python_logging": {
-        "file_name": "python_logging.txt"
-      }
-    },
-    "split": {
-      "train_percentage": 80,
-      "validation_percentage": 10,
-      "test_percentage": 10
+      "cv": 3
     }
   },
-  "grid_search": {
-    "param_grid": {
-      "boosting_type": [
-        "gbdt"
-      ],
-      "num_leaves": [
-        20,
-        30,
-        40
-      ],
-      "learning_rate": [
-        0.01,
-        0.05,
-        0.1
-      ],
-      "feature_fraction": [
-        0.8,
-        0.9,
-        1.0
-      ],
-      "bagging_fraction": [
-        0.7,
-        0.8,
-        0.9
-      ]
-    },
-    "cv": 3
+  "evaluate": {
+    "rmse": {}
+  },
+  "artefacts": {
+    "cv_results": {
+      "file_name": "cv_results.csv"
+    }
   }
 }
