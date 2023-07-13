@@ -30,8 +30,14 @@ jobs:
       - name: Unit tests
         run: ./.github/scripts/run_unit_tests.sh
 
-      - name: Functional test - categorisation
-        run: ./.github/scripts/run_categorisation.sh
+      - name: Functional test - categorisation - tuning
+        run: ./.github/scripts/run_categorisation_tuning.sh
 
-      - name: Functional test - regression
-        run: ./.github/scripts/run_regression.sh
+      - name: Functional test - categorisation - no tuning
+        run: ./.github/scripts/run_categorisation_no_tuning.sh
+
+      - name: Functional test - regression - tuning
+        run: ./.github/scripts/run_regression_tuning.sh
+
+      - name: Functional test - regression - no tuning
+        run: ./.github/scripts/run_regression_no_tuning.sh

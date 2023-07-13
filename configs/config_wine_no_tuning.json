@@ -1,0 +1,53 @@
+{
+  "setup": {
+    "experiment_name": "Wine sklearn regression"
+  },
+  "data": {
+    "data_source": "sklearn",
+    "dataset_name": "wine",
+    "input_columns": [
+      "alcohol",
+      "malic_acid",
+      "ash",
+      "alcalinity_of_ash",
+      "magnesium",
+      "total_phenols",
+      "flavanoids",
+      "nonflavanoid_phenols",
+      "proanthocyanins",
+      "color_intensity",
+      "hue",
+      "od280/od315_of_diluted_wines",
+      "proline"
+    ],
+    "output_columns": [
+      "cultivar"
+    ]
+  },
+  "split": {
+    "train_percentage": 80,
+    "validation_percentage": 10,
+    "test_percentage": 10,
+    "random_state": 42
+  },
+  "model": {
+    "library_name": "lightgbm",
+    "model_name": "LGBMRegressor",
+    "params": {
+      "boosting_type": "gbdt",
+      "num_leaves": 20,
+      "learning_rate": 0.01,
+      "feature_fraction": 0.5,
+      "bagging_fraction": 0.5
+    },
+    "callbacks": {}
+  },
+  "evaluate": {
+    "rmse": {}
+  },
+  "artefacts": {
+    "cv_results": {
+      "file_name": "cv_results.csv"
+    }
+  }
+}

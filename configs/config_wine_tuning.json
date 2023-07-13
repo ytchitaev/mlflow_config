@@ -37,7 +37,8 @@
     "callbacks": {}
   },
   "tuning": {
-    "grid_search": {
+    "name": "grid_search",
+    "params": {
       "param_grid": {
         "boosting_type": [
           "gbdt"

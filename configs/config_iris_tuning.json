@@ -1,0 +1,81 @@
+{
+  "setup": {
+    "experiment_name": "Iris sklearn categorisation"
+  },
+  "data": {
+    "data_source": "sklearn",
+    "dataset_name": "iris",
+    "input_columns": [
+      "sepal length (cm)",
+      "sepal width (cm)",
+      "petal length (cm)",
+      "petal width (cm)"
+    ],
+    "output_columns": [
+      "class"
+    ]
+  },
+  "split": {
+    "train_percentage": 80,
+    "validation_percentage": 10,
+    "test_percentage": 10,
+    "random_state": 42
+  },
+  "model": {
+    "library_name": "lightgbm",
+    "model_name": "LGBMClassifier",
+    "params": {},
+    "callbacks": {}
+  },
+  "tuning": {
+    "name": "grid_search",
+    "params": {
+      "param_grid": {
+        "boosting_type": [
+          "gbdt",
+          "dart"
+        ],
+        "num_leaves": [
+          15,
+          31,
+          150
+        ],
+        "learning_rate": [
+          0.01,
+          0.05,
+          0.5
+        ],
+        "n_estimators": [
+          50,
+          100,
+          300
+        ]
+      },
+      "cv": 3
+    }
+  },
+  "evaluate": {
+    "accuracy": {},
+    "precision": {
+      "additional": {
+        "average": "macro"
+      }
+    },
+    "recall": {
+      "additional": {
+        "average": "macro"
+      }
+    },
+    "f1": {
+      "additional": {
+        "average": "macro"
+      }
+    },
+    "rmse": {}
+  },
+  "artefacts": {
+    "cv_results": {
+      "file_name": "cv_results.csv"
+    }
+  }
+}
