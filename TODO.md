@@ -15,4 +15,3 @@
 - [ ] Port over plotting evaluation metrics on sample or should that be visible on mlflow?
 - [ ] Port over plotting cv_results or should that be visible in mflow?
 - [ ] Best practice for sampling model predictions, maybe web ui or can mlflow do it?
-
