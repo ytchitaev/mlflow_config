@@ -43,7 +43,7 @@ def main(config_file):
 
             # Instantiate model
             logger.info("Loading initial model...")
-            model = create_model(configs['model.library_name'], configs['model.model_name'], params={})
+            model = create_model(configs['model.library_name'], configs['model.model_name'], params={**configs['model.params']})
 
             # Run grid search to get best model parameters and log artifacts
             logger.info("Running grid search...")
@@ -51,9 +51,9 @@ def main(config_file):
             mlflow.log_params(best_params)
             mlflow_log_artifact_dict_to_csv(experiment_id, run_id, global_configs['run_temp_subdir'], configs['artefacts.cv_results.file_name'], cv_results)
 
-            # Train the model with the best parameters and log model
+            # Train the model with the best parameters and log model, model.params overwrite best parameters if specified in both
             logger.info("Training model with best parameters from grid search...")
-            best_model = create_model(configs['model.library_name'], configs['model.model_name'], best_params)
+            best_model = create_model(configs['model.library_name'], configs['model.model_name'], params = {**best_params, **configs['model.params']})
             best_model.fit(X_train, y_train, callbacks=[lgb.log_evaluation(period=100, show_stdv=True)])
             mlflow.lightgbm.log_model(best_model, "model")
 
@@ -69,8 +69,11 @@ def main(config_file):
             mlflow.log_param("status", "FAILED")
 
         else:
+            # debugging
             logger.info(f"Input columns: {', '.join(configs['data.input_columns'])}")
             logger.info(f"Output columns: {', '.join(configs['data.output_columns'])}")
+            logger.info(f"Best model parameters: { {**configs['model.params'], **best_params} }")
+            # success
             mlflow.log_param("status", "SUCCESS")
             logger.info(f"Model training completed - full path:{model_path}")
         

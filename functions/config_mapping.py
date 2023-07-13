@@ -20,6 +20,9 @@ EXPERIMENT_MAPPING = {
     'model': {},
     'model.library_name': {},
     'model.model_name': {},
+    'model.params': {},
+    # model - lightgbm
+    'model.callbacks': {},
     # tuning
     'tuning': {},
     'tuning.grid_search': {},

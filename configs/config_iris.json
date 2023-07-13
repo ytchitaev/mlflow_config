@@ -24,6 +24,7 @@
   "model": {
     "library_name": "lightgbm",
     "model_name": "LGBMClassifier",
+    "params": {},
     "callbacks": {}
   },
   "tuning": {

@@ -33,6 +33,7 @@
   "model": {
     "library_name": "lightgbm",
     "model_name": "LGBMRegressor",
+    "params": {},
     "callbacks": {}
   },
   "tuning": {
@@ -52,13 +53,14 @@
           0.1
         ],
         "feature_fraction": [
-          0.8,
+          0.5,
+          0.7,
           0.9,
           1.0
         ],
         "bagging_fraction": [
+          0.5,
           0.7,
-          0.8,
           0.9
         ]
       },
