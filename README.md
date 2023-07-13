@@ -34,9 +34,8 @@ flowchart LR
 ```
 
 ## Project Structure
-The project directory is organized as follows:
+The project directory is organised as follows:
 ```bash
-Copy code
 mlflow_config/
 │
 ├── .github/
