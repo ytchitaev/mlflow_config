@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python main.py -c config_iris_tuning.json
+python main.py -e iris_tuning.json

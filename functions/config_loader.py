@@ -1,6 +1,5 @@
+import os
 import json
-from typing import Any, List, Union
-from pathlib import Path
 
 
 def load_json(path: str):
@@ -8,38 +7,64 @@ def load_json(path: str):
         return json.load(f)
 
 
-def get_config_dir(file_name: str):
-    "navigate up from functions down to configs"
-    config_dir = Path(__file__).parent.parent / 'configs'
-    return config_dir / file_name
+def get_config_file_path(relative_path: str = 'configs', file_name: str = 'config_global.json'):
+    return os.path.join(os.getcwd(), relative_path, file_name)
 
 
-def get_config_value(config: Union[dict, list], keys: List[str], default: Any = None):
+def combine_configs(*configs):
+    combined_config = {}
+    for config in configs:
+        if config is not None:
+            combined_config = _recursive_merge(combined_config, config)
+    return combined_config
+
+
+def _recursive_merge(dict1, dict2):
+    merged_dict = dict1.copy()
+    for key, value in dict2.items():
+        if key in merged_dict and isinstance(merged_dict[key], dict) and isinstance(value, dict):
+            merged_dict[key] = _recursive_merge(merged_dict[key], value)
+        else:
+            merged_dict[key] = value
+    return merged_dict
+
+
+def get_config(json_obj, attribute_path="", default=None):
     """
-    Recursive function to get a configuration value from a nested dictionary or list.
-    :param config: The configuration dictionary or list.
-    :param keys: The list of keys representing the path in the configuration dictionary.
-    :param default: The default value to return if the configuration value is not found.
-    :return: The configuration value or the default value.
+    Get the value of an attribute from a JSON object.
+
+    Args:
+        json_obj (dict or list): The JSON object to retrieve the attribute from.
+        attribute_path (str, optional): The attribute path in dot notation. Defaults to an empty string.
+        default (any, optional): The default value to return if the attribute is not found. Defaults to None.
+
+    Returns:
+        any: The value of the attribute if found, otherwise the default value.
+
+    Examples:
+        # Retrieve the full json object
+        value = get_config(json_obj)
+
+        # Retrieve an attribute
+        value = get_config(json_obj, "element1.element2")
+        
+        # Retrieve a list item
+        value = get_config(json_obj, "element1.element2.0")
     """
-    # Base case: if there are no more keys, return the configuration or the default value
-    if not keys or isinstance(config, list):
-        return config if config is not None else default
-    # Get the next key
-    key = keys.pop(0)
-    # If the key is in the dictionary, recurse with the remaining keys
-    if key in config:
-        return get_config_value(config[key], keys, default)
-    # If the key is not in the dictionary, return the default value
-    return default
 
+    if not attribute_path:
+        return json_obj
 
-def load_configurations(config_file_name: str, mapping_specification: dict):
-    config_path = get_config_dir(config_file_name)
-    config = load_json(config_path)
-    configurations = {'': config}  # Include the root element
-    for path, default in mapping_specification.items():
-        keys = path.split('.')
-        value = get_config_value(config, keys, default)
-        configurations[path] = value
-    return configurations
+    attributes = attribute_path.split(".")
+    current_obj = json_obj
+
+    for attribute in attributes:
+        try:
+            current_obj = current_obj[int(attribute)] if isinstance(current_obj, list) else current_obj[attribute]
+        except (KeyError, IndexError, TypeError) as e:
+            element_type = "list index" if isinstance(current_obj, list) else "attribute"
+            print(f"Config {element_type} '{attribute}' is not defined {str(e)}")
+            return default
+    else:
+        return current_obj if current_obj is not None else default
+

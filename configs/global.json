@@ -1,0 +1,6 @@
+{
+    "global": {
+        "python_log_file_name": "python_logging.txt",
+        "run_temp_subdir": "temp"
+    }
+}
