@@ -2,6 +2,7 @@ import json
 from typing import Any, List, Union
 from pathlib import Path
 
+
 def load_json(path: str):
     with open(path, 'r') as f:
         return json.load(f)
@@ -24,26 +25,21 @@ def get_config_value(config: Union[dict, list], keys: List[str], default: Any = 
     # Base case: if there are no more keys, return the configuration or the default value
     if not keys or isinstance(config, list):
         return config if config is not None else default
-
     # Get the next key
     key = keys.pop(0)
-
     # If the key is in the dictionary, recurse with the remaining keys
     if key in config:
         return get_config_value(config[key], keys, default)
-
     # If the key is not in the dictionary, return the default value
     return default
+
 
 def load_configurations(config_file_name: str, mapping_specification: dict):
     config_path = get_config_dir(config_file_name)
     config = load_json(config_path)
-
     configurations = {'': config}  # Include the root element
-
     for path, default in mapping_specification.items():
         keys = path.split('.')
         value = get_config_value(config, keys, default)
         configurations[path] = value
-
     return configurations

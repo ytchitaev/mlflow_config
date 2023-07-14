@@ -25,9 +25,11 @@ EXPERIMENT_MAPPING = {
     'model.callbacks': {},
     # tuning
     'tuning': {},
-    'tuning.grid_search': {},
-    'tuning.grid_search.param_grid': {},
-    'tuning.grid_search.cv': {},
+    'tuning.name': {},
+    'tuning.params': {},
+    #'tuning.grid_search': {}, #removed
+    #'tuning.grid_search.param_grid': {}, #removed
+    #'tuning.grid_search.cv': {}, #removed
     # evaluate
     'evaluate': {},
     # artefacts
