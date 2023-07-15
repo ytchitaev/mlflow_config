@@ -1,6 +1,6 @@
 {
   "setup": {
-    "experiment_name": "Iris sklearn categorisation"
+    "experiment_name": "Iris sklearn categorisation - no tuning"
   },
   "data": {
     "data_source": "sklearn",

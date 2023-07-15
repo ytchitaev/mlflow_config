@@ -5,7 +5,8 @@ import mlflow
 import mlflow.lightgbm
 import lightgbm as lgb
 
-from functions.config_loader import setup_run, load_json, get_path, combine_configs, get_config, output_last_exec_json
+from functions.config_loader import load_json, get_full_path, combine_configs, get_config
+from functions.run_manager import setup_run, output_last_exec_json
 from functions.mlflow_logger import init_python_logger, mlflow_log_artifact_dict_to_csv, mlflow_log_artifact_dict_to_json
 from functions.data_loader import load_data
 from functions.data_splitter import split_dataset
@@ -22,10 +23,10 @@ def main(cfg):
         try:
 
             # Create logger, define run identifiers and log config and global config
-            run_id, experiment_id, experiment_run_path, model_path = setup_run(run)
+            run_id, experiment_id, experiment_run_path, artifacts_path, model_path = setup_run(run)
             logger, file_handler_path = init_python_logger(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), get_config(cfg, 'global.python_log_file_name'))
             mlflow_log_artifact_dict_to_json(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), "config.json", get_config(cfg))
-            output_last_exec_json(run_id, experiment_id)
+            output_last_exec_json(run_id, experiment_id, experiment_run_path, artifacts_path, model_path)
             logger.info(f"Started run: {experiment_run_path}")
 
             # Load data
@@ -78,8 +79,8 @@ def main(cfg):
             logger.info(f"Model training completed - full path:{model_path}")
 
         finally:
-            mlflow.log_artifact(file_handler_path)
             logger.info(f"Finished run: {experiment_run_path}")
+            mlflow.log_artifact(file_handler_path)
 
 
 if __name__ == "__main__":
@@ -91,9 +92,10 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--config_experiment_file_name', type=str, default='iris_tuning.json', help='Experiment JSON config file name')
     args = parser.parse_args()
 
-    config_global = load_json(get_path(args.config_path, args.config_global_file_name))
-    config_default = load_json(get_path(args.config_path, args.config_default_file_name))
-    config_experiment = load_json(get_path(args.config_path, args.config_experiment_file_name))
+    config_global = load_json(get_full_path(args.config_path, args.config_global_file_name))
+    config_default = load_json(get_full_path(args.config_path, args.config_default_file_name))
+    config_experiment = load_json(get_full_path(args.config_path, args.config_experiment_file_name))
+    
     config_combined = combine_configs(config_global, config_default, config_experiment)
 
     main(cfg=config_combined)

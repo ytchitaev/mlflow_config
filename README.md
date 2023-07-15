@@ -58,7 +58,7 @@ mlflow_config/
 │   ├── model_runner.py
 │   └── run_manager.py
 │
-└── main.py
+└── main_mlflow.py
 ```
 
 ## Configuration
@@ -76,8 +76,8 @@ mlflow_config/
 - `mlflow_logger.py` provides functions to set up the Python logger and log artifacts in MLflow.
 - `model_runner.py` provides classes to create models from the LightGBM library.
 - `run_manager.py` provides a function to set up the MLflow run.
-- Main script (`main.py`): The main entry point of the project that calls functions from the functions/ directory to execute the machine learning workflow based on the specified configuration.
+- Main script (`main_mlflow.py`): The main entry point of the project that calls functions from the functions/ directory to execute the machine learning workflow based on the specified configuration.
 
 ## GitHub Actions
 - GitHub Actions is used for automating the workflow for continuous integration and deployment. When code is pushed to the repository, GitHub Actions automatically triggers scripts defined in `.github/actions/` directory to run unit and functional tests to validate the integrity of the codebase.
-- The `run_categorisation.sh` and `run_regression.sh` scripts in the `.github/scripts/` directory are used for running functional tests on a sample categorisation and regression task, respectively. These scripts execute the main script (`main.py`) with specific configuration files to simulate actual ML workflows.
+- The `run_categorisation.sh` and `run_regression.sh` scripts in the `.github/scripts/` directory are used for running functional tests on a sample categorisation and regression task, respectively. These scripts execute the main script (`main_mlflow.py`) with specific configuration files to simulate actual ML workflows.

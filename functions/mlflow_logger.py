@@ -64,3 +64,6 @@ def mlflow_log_artifact_dict_to_json(experiment_run_path, run_temp_folder, file_
         json.dump(dictionary, file)
     mlflow.log_artifact(json_path)
     os.remove(json_path)
+
+#def delete_run_temp_folder(experiment_run_path, run_temp_folder):
+#    os.remove(os.path.join(experiment_run_path, run_temp_folder))

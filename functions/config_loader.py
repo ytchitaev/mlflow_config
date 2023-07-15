@@ -12,7 +12,7 @@ def write_json(last_run, output_path):
         json.dump(last_run, json_file)
 
 
-def get_path(relative_path: str = 'configs', file_name: str = 'config_global.json'):
+def get_full_path(relative_path: str = 'configs', file_name: str = 'global.json'):
     return os.path.join(os.getcwd(), relative_path, file_name)
 
 
@@ -75,26 +75,3 @@ def get_config(json_obj, attribute_path="", default=None):
             return default
     else:
         return current_obj if current_obj is not None else default
-
-
-def define_last_exec(run_id, experiment_id):
-    last_run = {
-        "run_id": run_id,
-        "experiment_id": experiment_id
-    }
-    return last_run
-
-
-def setup_run(run):
-    run_id = run.info.run_id
-    experiment_id = run.info.experiment_id
-    experiment_run_path = os.path.join("mlruns", experiment_id, run_id)
-    model_path = os.path.join("mlruns", experiment_id,
-                              run_id, "artifacts/model/model.pkl")
-    return run_id, experiment_id, experiment_run_path, model_path
-
-
-def output_last_exec_json(run_id, experiment_id):
-    last_exec_path = get_path("outputs", "last_exec.json")
-    last_exec_data = define_last_exec(run_id, experiment_id)
-    write_json(last_exec_data, last_exec_path)
