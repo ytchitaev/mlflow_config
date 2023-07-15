@@ -48,8 +48,7 @@ def main(cfg):
                 logger.info("Running tuning...")
                 tunning_runner = TuningRunner(get_config(cfg, 'tuning.name'), get_config(cfg, 'tuning.params'))
                 cv_params, cv_results = tunning_runner.run_tuning(model, X_train, y_train)
-                final_params.update(cv_params)
-                mlflow.log_params(final_params)
+                final_params.update(cv_params)                
                 mlflow_log_artifact_dict_to_csv(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), get_config(cfg, 'artefacts.cv_results.file_name'), cv_results)
 
             # Train the model with final params and log model
@@ -70,16 +69,16 @@ def main(cfg):
             mlflow.log_param("status", "FAILED")
 
         else:
-            # print log of result
-            logger.info(f"Input columns: {', '.join(get_config(cfg,'data.input_columns'))}")
-            logger.info(f"Output columns: {', '.join(get_config(cfg,'data.output_columns'))}")
-            logger.info(f"Final model parameters: { {**final_params} }")
-            # success
             mlflow.log_param("status", "SUCCESS")
-            logger.info(f"Model training completed - full path:{model_path}")
+            logger.info(f"Model run completed.")
 
         finally:
-            logger.info(f"Finished run: {experiment_run_path}")
+            logger.info(f"{'Input columns:' : <25} {get_config(cfg,'data.input_columns')}")
+            logger.info(f"{'Output columns:' : <25} {get_config(cfg,'data.output_columns')}")
+            logger.info(f"{'Model full path:' : <25} {model_path}")
+            logger.info(f"{'Final model parameters:' : <25} { {**final_params} }")
+            logger.info(f"{'Finished run:' : <25} {experiment_run_path}")
+            mlflow.log_params(final_params)
             mlflow.log_artifact(file_handler_path)
 
 
