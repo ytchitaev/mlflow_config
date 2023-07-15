@@ -6,7 +6,7 @@ MLRUNS_DIR = "mlruns"
 OUTPUTS_DIR = "outputs"
 CONFIGS_DIR = "configs"
 ARTIFACTS_DIR = "artifacts"
-MODEL_SUBDIR = "artifacts\model\model.pkl"
+MODEL_SUBDIR = "artifacts/model/model.pkl"
 LAST_EXEC_FILE_NAME = "last_exec.json"
 
 
