@@ -1,6 +1,6 @@
 {
   "setup": {
-    "experiment_name": "Wine sklearn regression"
+    "experiment_name": "Wine sklearn regression - no tuning"
   },
   "data": {
     "data_source": "sklearn",
