@@ -5,8 +5,7 @@ import mlflow
 import mlflow.lightgbm
 import lightgbm as lgb
 
-from functions.run_manager import setup_run
-from functions.config_loader import load_json, get_config_file_path, combine_configs, get_config
+from functions.config_loader import setup_run, load_json, get_path, combine_configs, get_config, output_last_exec_json
 from functions.mlflow_logger import init_python_logger, mlflow_log_artifact_dict_to_csv, mlflow_log_artifact_dict_to_json
 from functions.data_loader import load_data
 from functions.data_splitter import split_dataset
@@ -26,6 +25,7 @@ def main(cfg):
             run_id, experiment_id, experiment_run_path, model_path = setup_run(run)
             logger, file_handler_path = init_python_logger(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), get_config(cfg, 'global.python_log_file_name'))
             mlflow_log_artifact_dict_to_json(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), "config.json", get_config(cfg))
+            output_last_exec_json(run_id, experiment_id)
             logger.info(f"Started run: {experiment_run_path}")
 
             # Load data
@@ -45,10 +45,8 @@ def main(cfg):
             # Run tuning if enabled, update final params with tuned values and log final params
             if get_config(cfg, 'tuning'):
                 logger.info("Running tuning...")
-                tunning_runner = TuningRunner(get_config(
-                    cfg, 'tuning.name'), get_config(cfg, 'tuning.params'))
-                cv_params, cv_results = tunning_runner.run_tuning(
-                    model, X_train, y_train)
+                tunning_runner = TuningRunner(get_config(cfg, 'tuning.name'), get_config(cfg, 'tuning.params'))
+                cv_params, cv_results = tunning_runner.run_tuning(model, X_train, y_train)
                 final_params.update(cv_params)
                 mlflow.log_params(final_params)
                 mlflow_log_artifact_dict_to_csv(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), get_config(cfg, 'artefacts.cv_results.file_name'), cv_results)
@@ -71,7 +69,7 @@ def main(cfg):
             mlflow.log_param("status", "FAILED")
 
         else:
-            # debugging
+            # print log of result
             logger.info(f"Input columns: {', '.join(get_config(cfg,'data.input_columns'))}")
             logger.info(f"Output columns: {', '.join(get_config(cfg,'data.output_columns'))}")
             logger.info(f"Final model parameters: { {**final_params} }")
@@ -93,9 +91,9 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--config_experiment_file_name', type=str, default='iris_tuning.json', help='Experiment JSON config file name')
     args = parser.parse_args()
 
-    config_global = load_json(get_config_file_path(args.config_path, args.config_global_file_name))
-    config_default = load_json(get_config_file_path(args.config_path, args.config_default_file_name))
-    config_experiment = load_json(get_config_file_path(args.config_path, args.config_experiment_file_name))
+    config_global = load_json(get_path(args.config_path, args.config_global_file_name))
+    config_default = load_json(get_path(args.config_path, args.config_default_file_name))
+    config_experiment = load_json(get_path(args.config_path, args.config_experiment_file_name))
     config_combined = combine_configs(config_global, config_default, config_experiment)
 
     main(cfg=config_combined)
