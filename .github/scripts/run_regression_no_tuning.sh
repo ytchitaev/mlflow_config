@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python main.py -c config_wine_no_tuning.json
+python main.py -e wine_no_tuning.json

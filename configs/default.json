@@ -1,0 +1,19 @@
+{
+    "setup": {
+        "experiment_name": "Default"
+    },
+    "split": {
+        "train_percentage": 80,
+        "validation_percentage": 10,
+        "test_percentage": 10,
+        "random_state": 42
+    },
+    "artefacts": {
+        "python_logging": {
+            "file_name": "python_logging.txt"
+        },
+        "cv_results": {
+            "file_name": "cv_results.csv"
+        }
+    }
+}
