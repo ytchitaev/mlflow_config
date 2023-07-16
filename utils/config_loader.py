@@ -1,21 +1,3 @@
-import os
-import json
-
-
-def load_json(path: str):
-    with open(path, 'r') as f:
-        return json.load(f)
-
-
-def write_json(last_run, output_path):
-    with open(output_path, 'w') as json_file:
-        json.dump(last_run, json_file)
-
-
-def get_full_path(relative_path: str = 'configs', file_name: str = 'global.json'):
-    return os.path.join(os.getcwd(), relative_path, file_name)
-
-
 def combine_configs(*configs):
     combined_config = {}
     for config in configs:

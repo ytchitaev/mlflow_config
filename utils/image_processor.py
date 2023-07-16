@@ -1,7 +1,4 @@
-import json
-import os
 from enum import Enum
-from typing import Union, List
 import webbrowser
 
 
@@ -17,7 +14,7 @@ def save_image(image, output_path, filename="image", file_format=ImageFormat.PNG
     if file_format.value not in supported_formats:
         print(f"Unsupported file format: {file_format.value}")
         return
-        
+
     full_output_path = f"{output_path}/{filename}.{file_format.value}"
 
     format_options = {
@@ -33,19 +30,5 @@ def save_image(image, output_path, filename="image", file_format=ImageFormat.PNG
         print(f"Error saving image: {e}")
     return full_output_path
 
-
-def load_json(path: str):
-    with open(path, 'r') as f:
-        return json.load(f)
-
-
-def get_full_path(path_values: Union[str, List[Union[str, int]]], file_name: Union[str, int] = None):
-    """Get the full path by joining the path values list or single string and an optional file name."""
-    path_values = [str(path_values)] if isinstance(path_values, (str, int)) else list(map(str, path_values))
-    path = os.path.join(os.getcwd(), *[p.strip('/') for p in path_values])
-    if file_name is not None:
-        path = os.path.join(path, str(file_name))
-    return path
-
-def show_image_in_browser_if_debug(path):
+def show_image(path):
     webbrowser.open(path)
