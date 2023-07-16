@@ -22,7 +22,7 @@ def load_csv(path: str):
         return None
 
 
-def get_full_path(path_values: Union[str, List[Union[str, int]]], file_name: Union[str, int] = None):
+def get_relative_path(path_values: Union[str, List[Union[str, int]]], file_name: Union[str, int] = None):
     """Get the full path by joining the path values list or single string and an optional file name."""
     path_values = [str(path_values)] if isinstance(
         path_values, (str, int)) else list(map(str, path_values))

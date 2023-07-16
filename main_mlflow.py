@@ -8,7 +8,7 @@ import mlflow.lightgbm
 import lightgbm as lgb
 
 from utils.config_loader import combine_configs, get_config
-from utils.file_processor import load_json, get_full_path
+from utils.file_processor import load_json, get_relative_path
 from functions.run_manager import ExecInstance, setup_run, output_last_exec_json
 from functions.python_logger import init_python_logger
 from functions.mlflow_artifact_logger import mlflow_log_artifact_dict_to_csv, mlflow_log_artifact_dict_to_json
@@ -66,6 +66,9 @@ def main(cfg: dict):
                 # The artifacts from tuning_result that are logged, should be dynamic based BOTH on (1) artifacts specified in config and (2) data class attribute not being none
                 # If (1) but not (2) specific log message should be generated
 
+                # TODO - Supress the stdout logging when I am redirecting to INFO
+                # TODO - Supress multi_logloss output if not verbose
+
                 if get_config(cfg, 'artifacts.cv_results'):
                     logger.info("Logging cv_results artifact...")
                     mlflow_log_artifact_dict_to_csv(exec, cfg, get_config(cfg, 'artifacts.cv_results.file_name'), tuning_result.cv_results)
@@ -114,9 +117,9 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--config_experiment_file_name', type=str, default='iris_tuning.json', help='Experiment JSON config file name')
     args = parser.parse_args()
 
-    config_global = load_json(get_full_path(args.config_path, args.config_global_file_name))
-    config_default = load_json(get_full_path(args.config_path, args.config_default_file_name))
-    config_experiment = load_json(get_full_path(args.config_path, args.config_experiment_file_name))
+    config_global = load_json(get_relative_path(args.config_path, args.config_global_file_name))
+    config_default = load_json(get_relative_path(args.config_path, args.config_default_file_name))
+    config_experiment = load_json(get_relative_path(args.config_path, args.config_experiment_file_name))
     config_combined = combine_configs(config_global, config_default, config_experiment)
 
     main(cfg=config_combined)
