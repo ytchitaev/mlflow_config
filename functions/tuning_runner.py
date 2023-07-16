@@ -1,12 +1,21 @@
 import pandas as pd
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Dict, Any, Tuple
+
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+
+
+@dataclass
+class TuningResult:
+    best_params: Dict[str, Any]
+    cv_results: Dict[str, Any]
+    best_estimator_evals_result: Any
 
 
 class TuningMethod(ABC):
     @abstractmethod
-    def perform_tuning(self, model: Any, X_train: pd.DataFrame, y_train: pd.Series, X_validation: pd.DataFrame, y_validation: pd.Series) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    def perform_tuning(self, model: Any, X_train: pd.DataFrame, y_train: pd.Series, X_validation: pd.DataFrame, y_validation: pd.Series) -> TuningResult:
         pass
 
 
@@ -25,8 +34,9 @@ class GridSearchMethod(TuningMethod):
                                    n_jobs=self.n_jobs, refit=self.refit, return_train_score=self.return_train_score, verbose=self.verbose)
         grid_search.fit(X=X_train, y=y_train, eval_set=(
             X_validation, y_validation), eval_names='validation')
-        best_estimator = grid_search.best_estimator_ if self.refit else None # return conditional on refit = True
-        return grid_search.best_params_, grid_search.cv_results_, best_estimator
+        # return conditional on refit = True
+        best_estimator_evals_result = grid_search.best_estimator_.evals_result_ if self.refit else None
+        return TuningResult(grid_search.best_params_, grid_search.cv_results_, best_estimator_evals_result)
 
 
 class RandomSearchMethod(TuningMethod):
@@ -41,8 +51,9 @@ class RandomSearchMethod(TuningMethod):
             model, self.param_dist, n_iter=self.n_iter, cv=self.cv, refit=self.refit)
         random_search.fit(X=X_train, y=y_train, eval_set=(
             X_validation, y_validation), eval_names='validation')
-        best_estimator = random_search.best_estimator_ if self.refit else None  # return conditional on refit = True
-        return random_search.best_params_, random_search.cv_results_, best_estimator
+        # return conditional on refit = True
+        best_estimator_evals_result = random_search.best_estimator_.evals_result_ if self.refit else None
+        return TuningResult(random_search.best_params_, random_search.cv_results_, best_estimator_evals_result)
 
 
 class TuningRunner:

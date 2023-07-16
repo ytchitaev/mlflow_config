@@ -51,9 +51,6 @@
     },
     "rmse": {}
   },
-  "artefacts": {
-    "cv_results": {
-      "file_name": "cv_results.csv"
-    }
+  "artifacts": {
   }
 }

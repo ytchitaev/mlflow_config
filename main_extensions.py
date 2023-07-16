@@ -3,7 +3,7 @@ from utils.config_loader import get_config
 from utils.file_processor import load_json, load_csv, get_full_path
 from utils.image_processor import ImageFormat, save_image, show_image
 from extensions.plot_lgbm_tree import plot_lightgbm_tree
-from extensions.plot_best_estimator import plot_best_estimator
+from extensions.plot_best_estimator_evals_result import plot_best_estimator_evals_result
 from extensions.plot_cv_results import plot_cv_results
 
 
@@ -15,15 +15,15 @@ def main(cfg: dict, ext: str, debug: bool, last_exec: dict):
             plt, last_exec['artifacts_path'], 'plot_lgbm_tree', ImageFormat.PNG)
         show_image(full_output_path) if debug else None
 
-    if 'plot_best_estimator' in ext:
-        best_estimator = load_json(get_full_path(
-            last_exec['artifacts_path'], "best_estimator.json"))
-        plt = plot_best_estimator(best_estimator)
+    if ('plot_best_estimator_evals_result' in ext) and ('best_estimator_evals_result' in last_exec['artifacts_list']):
+        best_estimator_evals_result = load_json(get_full_path(
+            last_exec['artifacts_path'], "best_estimator_evals_result.json"))
+        plt = plot_best_estimator_evals_result(best_estimator_evals_result)
         full_output_path = save_image(
-            plt, last_exec['artifacts_path'], 'plot_best_estimator', ImageFormat.PNG)
+            plt, last_exec['artifacts_path'], 'plot_best_estimator_evals_result', ImageFormat.PNG)
         show_image(full_output_path) if debug else None
 
-    if 'plot_cv_results' in ext:
+    if ('plot_cv_results' in ext) and ('cv_results' in last_exec['artifacts_list']):
         cv_results = load_csv(get_full_path(
             last_exec['artifacts_path'], "cv_results.csv"))
         plt = plot_cv_results(cv_results)
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--config_path', type=str, default='configs', help='Configs project path')
     parser.add_argument('-g', '--config_global_file_name', type=str, default='global.json', help='Global JSON config file name')
-    parser.add_argument('-e', '--extensions', nargs='+', type=str, default=['plot_lgbm_tree', 'plot_cv_results', 'plot_best_estimator'], help='Extensions to run')
+    parser.add_argument('-e', '--extensions', nargs='+', type=str, default=['plot_lgbm_tree', 'plot_cv_results', 'plot_best_estimator_evals_result'], help='Extensions to run')
     parser.add_argument('-d', '--debug', action='store_true', help='Flag to enable debug functionality of extension(s)')
     args = parser.parse_args()
 

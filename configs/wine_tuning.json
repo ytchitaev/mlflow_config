@@ -76,12 +76,12 @@
   "evaluate": {
     "rmse": {}
   },
-  "artefacts": {
+  "artifacts": {
     "cv_results": {
       "file_name": "cv_results.csv"
     },
-    "best_estimator": {
-      "file_name": "best_estimator.json"
+    "best_estimator_evals_result": {
+      "file_name": "best_estimator_evals_result.json"
     }
   }
 }
