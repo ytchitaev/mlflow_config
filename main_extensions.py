@@ -9,6 +9,10 @@ from extensions.plot_cv_results import plot_cv_results
 
 def main(cfg: dict, ext: str, debug: bool, last_exec: dict):
 
+    # debug
+    print(cfg)
+    print(last_exec)
+
     if 'plot_lgbm_tree' in ext:
         plt = plot_lightgbm_tree(last_exec['model_path'])
         full_output_path = save_image(
@@ -43,5 +47,9 @@ if __name__ == "__main__":
 
     config_global = load_json(get_full_path(args.config_path, args.config_global_file_name))
     last_exec = load_json(get_full_path(get_config(config_global, 'global.outputs_dir'), get_config(config_global, 'global.last_exec_file_name')))
+
+    # debug
+    print(config_global)
+    print(last_exec)
 
     main(cfg=config_global, ext=args.extensions, debug=args.debug, last_exec=last_exec)
