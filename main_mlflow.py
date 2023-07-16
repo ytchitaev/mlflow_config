@@ -47,9 +47,11 @@ def main(cfg):
             if get_config(cfg, 'tuning'):
                 logger.info("Running tuning...")
                 tunning_runner = TuningRunner(get_config(cfg, 'tuning.name'), get_config(cfg, 'tuning.params'))
-                cv_params, cv_results = tunning_runner.run_tuning(model, X_train, y_train)
-                final_params.update(cv_params)                
+                cv_params, cv_results, best_estimator = tunning_runner.run_tuning(model, X_train, y_train, X_validation, y_validation)
+                final_params.update(cv_params)
                 mlflow_log_artifact_dict_to_csv(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), get_config(cfg, 'artefacts.cv_results.file_name'), cv_results)
+                if best_estimator:
+                    mlflow_log_artifact_dict_to_json(experiment_run_path, get_config(cfg, 'global.run_temp_subdir'), get_config(cfg, 'artefacts.best_estimator.file_name'), best_estimator.evals_result_)
 
             # Train the model with final params and log model
             logger.info("Training model...")

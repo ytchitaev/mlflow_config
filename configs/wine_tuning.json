@@ -65,7 +65,12 @@
           0.9
         ]
       },
-      "cv": 3
+      "cv": 5,
+      "scoring": "neg_mean_squared_error",
+      "n_jobs": -1,
+      "refit": true,
+      "return_train_score": true,
+      "verbose": false
     }
   },
   "evaluate": {
@@ -74,6 +79,9 @@
   "artefacts": {
     "cv_results": {
       "file_name": "cv_results.csv"
+    },
+    "best_estimator": {
+      "file_name": "best_estimator.json"
     }
   }
 }

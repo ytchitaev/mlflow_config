@@ -6,7 +6,7 @@ MLRUNS_DIR = "mlruns"
 OUTPUTS_DIR = "outputs"
 CONFIGS_DIR = "configs"
 ARTIFACTS_DIR = "artifacts"
-MODEL_SUBDIR = "artifacts/model/model.pkl"
+MODEL_RUN_SUBDIR = "artifacts/model/model.pkl"
 LAST_EXEC_FILE_NAME = "last_exec.json"
 
 
@@ -48,7 +48,7 @@ def setup_run(run):
     artifacts_path = get_full_path(
         [MLRUNS_DIR, experiment_id, run_id, ARTIFACTS_DIR])
     model_path = get_full_path(
-        [MLRUNS_DIR, experiment_id, run_id, MODEL_SUBDIR])
+        [MLRUNS_DIR, experiment_id, run_id, MODEL_RUN_SUBDIR])
     return run_id, experiment_id, experiment_run_path, artifacts_path, model_path
 
 
