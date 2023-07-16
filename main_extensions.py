@@ -46,10 +46,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     config_global = load_json(get_full_path(args.config_path, args.config_global_file_name))
-    last_exec = load_json(get_full_path(get_config(config_global, 'global.outputs_dir'), get_config(config_global, 'global.last_exec_file_name')))
+
+    last_exec = load_json(get_full_path(['outputs','last_exec.json'])) # TEST RAW STRING
+    #last_exec = load_json(get_full_path(get_config(config_global, 'global.outputs_dir'), get_config(config_global, 'global.last_exec_file_name')))
 
     # debug
-    print(get_full_path(get_config(config_global, 'global.outputs_dir'), get_config(config_global, 'global.last_exec_file_name')))
     print(config_global)
     print(last_exec)
 
