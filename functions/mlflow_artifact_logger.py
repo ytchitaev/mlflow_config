@@ -5,9 +5,9 @@ import mlflow
 from utils.config_loader import get_config
 from utils.file_processor import write_json
 
-def mlflow_log_artifact_dict_to_csv(exec, cfg, file_name, dictionary):
+def mlflow_log_artifact_dict_to_csv(cfg, file_name, dictionary):
     dictionary_df = pd.DataFrame(dictionary)
-    temp_dir = os.path.join(exec.experiment_run_path,
+    temp_dir = os.path.join(get_config(cfg, 'execution.experiment_run_path'),
                             get_config(cfg, 'global.temp_dir'))
     os.makedirs(temp_dir, exist_ok=True)
     csv_path = os.path.join(temp_dir, file_name)
@@ -16,8 +16,8 @@ def mlflow_log_artifact_dict_to_csv(exec, cfg, file_name, dictionary):
     os.remove(csv_path)
 
 
-def mlflow_log_artifact_dict_to_json(exec, cfg, file_name, dictionary):
-    temp_dir = os.path.join(exec.experiment_run_path,
+def mlflow_log_artifact_dict_to_json(cfg, file_name, dictionary):
+    temp_dir = os.path.join(get_config(cfg, 'execution.experiment_run_path'),
                             get_config(cfg, 'global.temp_dir'))
     os.makedirs(temp_dir, exist_ok=True)
     json_path = os.path.join(temp_dir, file_name)

@@ -1,3 +1,13 @@
+# LATEST
+
+- TODO - log artifacts should be made dynamic log_all_artifacts()
+- It should be scoped to args - get_config(cfg, 'tuning.artifacts'), get_config(cfg, 'global') so that get_config can not be called from artifact_logger
+- 'input_type' and 'output_type' should specify which mlflow_log_artifact_*_* method to use, maybe split read and write?
+- The artifacts from tuning_result that are logged, should be dynamic based BOTH on (1) artifacts specified in config and (2) data class attribute not being none
+- If (1) but not (2) specific log message should be generated
+- TODO - Supress the stdout logging when I am redirecting to INFO
+- TODO - Supress multi_logloss output if not verbose
+
 # Main
 - [x] Use this approach for building dynamic additional_args to pass to load_data() and similar approach for other such elements https://chat.openai.com/share/d563ff72-3ad0-454e-be70-70d984d6b52f
 - [x] Move out processing of run_id / experiment_id / determining paths to a separate function / py file
