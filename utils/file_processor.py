@@ -1,38 +1,8 @@
 import json
 import os
 import pandas as pd
-from enum import Enum
 from typing import Union, List
-import webbrowser
 
-
-class ImageFormat(Enum):
-    PNG = 'png'
-    JPG = 'jpg'
-    SVG = 'svg'
-
-
-def save_image(image, output_path, filename="image", file_format=ImageFormat.PNG):
-    supported_formats = [f.value for f in ImageFormat]
-
-    if file_format.value not in supported_formats:
-        print(f"Unsupported file format: {file_format.value}")
-        return
-
-    full_output_path = f"{output_path}/{filename}.{file_format.value}"
-
-    format_options = {
-        ImageFormat.PNG: {'format': 'png'},
-        ImageFormat.JPG: {'format': 'jpg'},
-        ImageFormat.SVG: {'format': 'svg'}
-    }
-
-    try:
-        image.savefig(full_output_path, **format_options[file_format])
-        print(f"Image saved as {file_format.name} at {full_output_path}")
-    except Exception as e:
-        print(f"Error saving image: {e}")
-    return full_output_path
 
 
 def load_json(path: str):
@@ -61,6 +31,12 @@ def get_full_path(path_values: Union[str, List[Union[str, int]]], file_name: Uni
         path = os.path.join(path, str(file_name))
     return path
 
+def write_json(json_obj, output_path):
+    with open(output_path, 'w') as json_file:
+        json.dump(json_obj, json_file)
 
-def show_image_in_browser_if_debug(path):
-    webbrowser.open(path)
+
+def check_and_create_path(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
