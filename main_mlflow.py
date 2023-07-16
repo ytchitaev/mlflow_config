@@ -50,8 +50,8 @@ def main(cfg: dict):
             # Run tuning if enabled, update final params with tuned values and log final params
             if get_config(cfg, 'tuning'):
                 logger.info("Tuning model...")
-                tunning_runner = TuningRunner(get_config(cfg, 'tuning.name'), get_config(cfg, 'tuning.params'))
-                tuning_result: Type[TuningResult] = tunning_runner.run_tuning(model, X_train, y_train, X_validation, y_validation)
+                tuning_runner = TuningRunner(get_config(cfg, 'tuning.name'), get_config(cfg, 'tuning.params'))
+                tuning_result: Type[TuningResult] = tuning_runner.run_tuning(model, X_train, y_train, X_validation, y_validation)
                 final_params.update(tuning_result.best_params)
 
                 if get_config(cfg, 'artifacts.cv_results'):
