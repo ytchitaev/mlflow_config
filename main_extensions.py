@@ -56,4 +56,4 @@ if __name__ == "__main__":
     print(get_full_path(get_config(config_global, 'global.outputs_dir'), get_config(config_global, 'global.last_exec_file_name')))
     print(last_exec)
 
-    #main(cfg=config_global, ext=args.extensions, debug=args.debug, last_exec=last_exec)
+    main(cfg=config_global, ext=args.extensions, debug=args.debug, last_exec=last_exec)

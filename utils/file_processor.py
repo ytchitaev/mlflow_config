@@ -26,7 +26,7 @@ def get_full_path(path_values: Union[str, List[Union[str, int]]], file_name: Uni
     """Get the full path by joining the path values list or single string and an optional file name."""
     path_values = [str(path_values)] if isinstance(
         path_values, (str, int)) else list(map(str, path_values))
-    path = os.path.join(os.getcwd(), *[p.strip('/') for p in path_values])
+    path = os.path.join(*[p.strip('/') for p in path_values])
     if file_name is not None:
         path = os.path.join(path, str(file_name))
     return path
