@@ -26,7 +26,8 @@ def init_python_logger(exec, cfg: dict):
     logger.setLevel(logging.INFO)
 
     # Redirect stdout to logger
-    sys.stdout = StreamToLogger(logger, logging.INFO)
+    # DISABLED AS IT CURRENTLY CAUSES DUPLICATE LOGGING INSTEAD OF REDIRECTION
+    #sys.stdout = StreamToLogger(logger, logging.INFO)
 
     # Create a console handler for logging output to the CLI/IDE
     console_handler = logging.StreamHandler()
