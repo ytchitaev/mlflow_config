@@ -49,6 +49,7 @@ if __name__ == "__main__":
     last_exec = load_json(get_full_path(get_config(config_global, 'global.outputs_dir'), get_config(config_global, 'global.last_exec_file_name')))
 
     # debug
+    print(get_full_path(get_config(config_global, 'global.outputs_dir'), get_config(config_global, 'global.last_exec_file_name')))
     print(config_global)
     print(last_exec)
 
