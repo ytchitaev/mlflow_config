@@ -26,7 +26,7 @@ def main(cfg: dict):
 
         try:
 
-            # Build execution config, combine into config, and init python logger
+            # Add execution to config and record as artifact, init python logger
             exec_cfg = build_execution_config(run, get_config(cfg, 'global'))
             cfg = combine_configs(cfg, exec_cfg)
             logger, file_handler_path = init_python_logger(cfg)
