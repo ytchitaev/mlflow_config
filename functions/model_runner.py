@@ -1,23 +1,23 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
-from lightgbm import LGBMClassifier, LGBMRegressor, LGBMRanker
+import lightgbm as lgb
 
-class Model(ABC):
+class LGBMModel(ABC):
     @abstractmethod
     def create(self, params: Dict[str, Any]) -> Any:
         pass
 
-class LGBMClassifierModel(Model):
+class LGBMClassifierModel(LGBMModel):
     def create(self, params: Dict[str, Any]) -> Any:
-        return LGBMClassifier(**params)
+        return lgb.LGBMClassifier(**params)
 
-class LGBMRegressorModel(Model):
+class LGBMRegressorModel(LGBMModel):
     def create(self, params: Dict[str, Any]) -> Any:
-        return LGBMRegressor(**params)
+        return lgb.LGBMRegressor(**params)
 
-class LGBMRankerModel(Model):
+class LGBMRankerModel(LGBMModel):
     def create(self, params: Dict[str, Any]) -> Any:
-        return LGBMRanker(**params)
+        return lgb.LGBMRanker(**params)
 
 MODELS = {
     ("lightgbm", "LGBMClassifier"): LGBMClassifierModel(),
@@ -32,3 +32,6 @@ def create_model(cfg_model: dict, params: Dict[str, Any]) -> Any:
     if model_creator is None:
         raise ValueError(f"Unsupported library name: {library_name} - model name: {model_name}")
     return model_creator.create(params)
+
+def fit_model(model, X_train, y_train):
+    model.fit(X_train, y_train, callbacks=[lgb.log_evaluation(period=100, show_stdv=True)])

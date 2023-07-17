@@ -30,7 +30,15 @@
       "learning_rate": 0.05,
       "n_estimators": 50
     },
-    "callbacks": {}
+    "additional_args": {
+      "callbacks": [
+        {
+          "callback_type": "log_evaluation",
+          "period": 100,
+          "show_stdv": true
+        }
+      ]
+    }
   },
   "evaluate": {
     "accuracy": {},
@@ -51,6 +59,5 @@
     },
     "rmse": {}
   },
-  "artifacts": {
-  }
+  "artifacts": {}
 }

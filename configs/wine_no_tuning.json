@@ -40,7 +40,15 @@
       "feature_fraction": 0.5,
       "bagging_fraction": 0.5
     },
-    "callbacks": {}
+    "additional_args": {
+      "callbacks": [
+        {
+          "callback_type": "log_evaluation",
+          "period": 100,
+          "show_stdv": true
+        }
+      ]
+    }
   },
   "evaluate": {
     "rmse": {}

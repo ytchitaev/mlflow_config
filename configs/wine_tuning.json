@@ -34,7 +34,15 @@
     "library_name": "lightgbm",
     "model_name": "LGBMRegressor",
     "params": {},
-    "callbacks": {}
+    "additional_args": {
+      "callbacks": [
+        {
+          "callback_type": "log_evaluation",
+          "period": 100,
+          "show_stdv": true
+        }
+      ]
+    }
   },
   "tuning": {
     "name": "grid_search",

@@ -5,7 +5,6 @@ from typing import Type
 
 import mlflow
 import mlflow.lightgbm
-import lightgbm as lgb
 
 from utils.config_loader import combine_configs, get_config
 from utils.file_processor import load_json, get_relative_path
@@ -14,7 +13,7 @@ from functions.python_logger import init_python_logger
 from functions.mlflow_artifact_logger import mlflow_log_artifact_dict_to_csv, mlflow_log_artifact_dict_to_json
 from functions.data_loader import load_data
 from functions.data_splitter import split_dataset
-from functions.model_runner import create_model
+from functions.model_runner import create_model, fit_model
 from functions.tuning_runner import TuningRunner, TuningResult
 from functions.metrics_evaluator import MetricFactory
 
@@ -65,7 +64,10 @@ def main(cfg: dict):
             # Train the model with final params and log model
             logger.info("Training model...")
             best_model = create_model(cfg_model = get_config(cfg, 'model'), params=final_params)
-            best_model.fit(X_train, y_train, callbacks=[lgb.log_evaluation(period=100, show_stdv=True)])
+            logger.info("Fitting model...")
+            fit_model(best_model, X_train, y_train)
+            #best_model.fit(X_train, y_train, callbacks=[lgb.log_evaluation(period=100, show_stdv=True)])
+
             mlflow.lightgbm.log_model(best_model, "model")
 
             # Evaluate model and log evaluations
