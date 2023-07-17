@@ -1,3 +1,5 @@
+# Notes
+- /function/*file should be grouped by an executing input - in future these can be orchestrated as required
 # LATEST
 
 - TODO - log artifacts should be made dynamic log_all_artifacts()
