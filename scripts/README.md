@@ -1,0 +1,1 @@
+- Call scripts from root project directory e.g. `.\scripts\run_tests.ps1`
