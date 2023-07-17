@@ -21,10 +21,14 @@ class SklearnDataLoader(DataLoader):
     def load_data(self, input_columns: List[str], output_columns: List[str], dataset_name: str) -> Tuple[pd.DataFrame, pd.Series]:
         load_func = getattr(datasets, f"load_{dataset_name}")
         data = load_func()
-        # output column filtering is not enabled as sklearn does not always make the output column name available
-        # output column name is driven by config
-        self.input_columns = [col for col in data.feature_names if col in input_columns]
-        X = pd.DataFrame(data.data, columns=data.feature_names)[self.input_columns]
+        # input column filtering if input_columns config is populated, else uses all sklearn data input columns
+        if self.input_columns:
+            self.input_columns = [col for col in data.feature_names if col in input_columns]
+            X = pd.DataFrame(data.data, columns=data.feature_names)[self.input_columns]
+        else:
+            X = pd.DataFrame(data.data, columns=data.feature_names)
+        # output column filtering is not enabled as sklearn does not always label the output column(s)
+        # output_columns in config are used only for extensions labelling   
         y = pd.Series(data.target)
         return X, y
 
