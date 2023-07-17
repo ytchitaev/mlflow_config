@@ -57,3 +57,4 @@ def get_config(json_obj, attribute_path="", default=None):
             return default
     else:
         return current_obj if current_obj is not None else default
+

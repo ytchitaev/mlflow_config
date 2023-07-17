@@ -8,6 +8,6 @@
         "artifacts_model_subdir_path": "model/model.pkl",
         "config_file_name": "config.json",
         "python_log_file_name": "python_logging.txt",
-        "last_exec_file_name": "last_exec.json"
+        "last_execution_config": "last_execution_config.json"
     }
 }
