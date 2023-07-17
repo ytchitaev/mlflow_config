@@ -2,7 +2,7 @@ from sklearn import metrics
 from enum import Enum, auto
 from sklearn.metrics import mean_squared_error
 from math import sqrt
-
+import mlflow
 
 class AverageTypes(Enum):
     MICRO = 'micro'
