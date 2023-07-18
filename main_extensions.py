@@ -1,5 +1,5 @@
 import argparse
-from utils.config_loader import get_config
+from utils.config_loader import get_config, is_list_item_in_dict
 from utils.file_processor import load_json, load_csv, get_relative_path
 from utils.image_processor import ImageFormat, save_image, show_image
 from extensions.plot_lgbm_tree import plot_lightgbm_tree
@@ -17,13 +17,13 @@ def main(cfg: dict, ext: str, debug: bool):
         full_output_path = save_image(plt, get_config(cfg, 'execution.artifact_path'), 'plot_lgbm_tree', ImageFormat.PNG)
         show_image(full_output_path) if debug else None
 
-    if ('plot_best_estimator_evals_result' in ext) and ('best_estimator_evals_result' in list(get_config(cfg, 'artifacts').keys())):
+    if ('plot_best_estimator_evals_result' in ext) and is_list_item_in_dict('best_estimator_evals_result', cfg['artifacts']):
         best_estimator_evals_result = load_json(get_relative_path(get_config(cfg, 'execution.artifact_path'), "best_estimator_evals_result.json"))
         plt = plot_best_estimator_evals_result(best_estimator_evals_result)
         full_output_path = save_image(plt, get_config(cfg, 'execution.artifact_path'), 'plot_best_estimator_evals_result', ImageFormat.PNG)
         show_image(full_output_path) if debug else None
 
-    if ('plot_cv_results' in ext) and ('cv_results' in list(get_config(cfg, 'artifacts').keys())):
+    if ('plot_cv_results' in ext) and is_list_item_in_dict('cv_results', cfg['artifacts']):
         cv_results = load_csv(get_relative_path(get_config(cfg, 'execution.artifact_path'), "cv_results.csv"))
         plt = plot_cv_results(cv_results)
         full_output_path = save_image(plt, get_config(cfg, 'execution.artifact_path'), 'plot_cv_results', ImageFormat.PNG)

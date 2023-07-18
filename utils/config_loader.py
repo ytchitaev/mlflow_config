@@ -15,6 +15,8 @@ def _recursive_merge(dict1, dict2):
             merged_dict[key] = value
     return merged_dict
 
+def is_list_item_in_dict(list_item, attribute_list):
+    return list_item in attribute_list if isinstance(attribute_list, list) else False
 
 def get_config(json_obj, attribute_path="", default=None):
     """
