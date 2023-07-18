@@ -19,22 +19,31 @@ def build_execution_config(run, cfg_global: dict) -> dict:
         }
     }
 
+
 def write_last_config(cfg: dict):
     output_path = get_relative_path(get_config(cfg, 'global.outputs_dir'))
     check_and_create_path(output_path)
     last_exec_config_file = get_relative_path([output_path, get_config(cfg, 'global.last_execution_config')])
     write_json(cfg, last_exec_config_file)
+    pass
 
 
-def execution_outcome(status, logger, exception:Exception=None, traceback:traceback=None):
+def setup_experiment(cfg):
+    mlflow.set_experiment(get_config(cfg, 'setup.experiment_name'))
+    pass
+
+
+def log_run_outcome(status, logger, exception:Exception=None, traceback:traceback=None):
     mlflow.log_param("status", status)
     if exception:
         logger.error(f"Exception occurred during model training: {str(exception)}")
         logger.error(f"Traceback: {traceback.format_exc()}")
     else:
         logger.info(f"Model run completed.")
+    pass
 
-def finalise_execution(cfg, logger, final_params, file_handler_path):
+
+def finalise_run(cfg, logger, final_params, file_handler_path):
     logger.info(f"{'Final model parameters:' : <25} { {**final_params} }")
     logger.info(f"{'Input columns:' : <25} {get_config(cfg,'data.input_columns')}")
     logger.info(f"{'Output columns:' : <25} {get_config(cfg,'data.output_columns')}")
@@ -43,3 +52,4 @@ def finalise_execution(cfg, logger, final_params, file_handler_path):
     write_last_config(cfg)
     mlflow.log_params(final_params)
     mlflow.log_artifact(file_handler_path)
+    pass

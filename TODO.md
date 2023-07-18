@@ -1,4 +1,10 @@
 # Notes
+
+- improve how extensions are processed, need a way to track artefacts - maybe write to config?
+- artefacts in config are currently unused, either build this dynamically per above or remove
+- callbacks are not currently implemented, either remove from config or adapt
+
+# Notes
 - /function/*file should be grouped by an executing input - in future these can be orchestrated as required
 # LATEST
 

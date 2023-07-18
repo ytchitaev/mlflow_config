@@ -78,7 +78,10 @@ class AzureSQLDataLoader(DataLoader):
 #        return X, y
 
 
-def load_data(data_source: str, input_columns: List[str], output_columns: List[str], **kwargs) -> Tuple[pd.DataFrame, pd.Series]:
+def load_data(logger, data_source: str, input_columns: List[str], output_columns: List[str], **kwargs) -> Tuple[pd.DataFrame, pd.Series]:
+    
+    logger.info("Loading data...")
+    
     loader_classes = {
         'sklearn': SklearnDataLoader,
         'csv': CSVDataLoader,

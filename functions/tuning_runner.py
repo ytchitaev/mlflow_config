@@ -2,9 +2,9 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, Any, Tuple
-
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
-from functions.mlflow_artifact_logger import mlflow_log_artifact_dict_to_csv, mlflow_log_artifact_dict_to_json
+
+from loggers.mlflow_artifact_logger import mlflow_log_artifact_dict_to_csv, mlflow_log_artifact_dict_to_json
 
 @dataclass
 class TuningParams:

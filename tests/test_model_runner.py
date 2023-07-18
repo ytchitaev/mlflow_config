@@ -1,5 +1,5 @@
 import unittest
-from functions.model_runner import create_model
+from functions.model_creator import create_model
 from lightgbm import LGBMClassifier, LGBMRegressor, LGBMRanker
 
 class TestCreateModel(unittest.TestCase):

@@ -1,76 +1,35 @@
 import argparse
 import traceback
-import copy
 import mlflow
 
-from utils.config_loader import combine_configs, get_config
+from utils.config_loader import combine_configs
 from utils.file_processor import load_json, get_relative_path
-from functions.execution_manager import build_execution_config, finalise_execution, execution_outcome
-from functions.python_logger import init_python_logger
-from functions.mlflow_artifact_logger import mlflow_log_artifact_dict_to_json
-from functions.data_loader import load_data
-from functions.data_splitter import split_dataset
-from functions.model_runner import create_model, fit_model, log_model
-from functions.tuning_runner import TuningRunner
-from functions.metrics_evaluator import MetricFactory
+from functions.run_manager import setup_experiment, finalise_run, log_run_outcome
+from stages.experiment_stages import *
 
 
 def main(cfg: dict):
 
-    mlflow.set_experiment(get_config(cfg, 'setup.experiment_name'))
+    setup_experiment(cfg)
     with mlflow.start_run() as run:
 
         try:
-
-            # Add execution to config and record as artifact, init python logger
-            exec_cfg = build_execution_config(run, get_config(cfg, 'global'))
-            cfg = combine_configs(cfg, exec_cfg)
-            logger, file_handler_path = init_python_logger(cfg)
-            mlflow_log_artifact_dict_to_json(cfg, get_config(cfg, 'global.config_file_name'), get_config(cfg))
-            logger.info(f"Started run: {get_config(cfg, 'execution.experiment_run_path')}")
-
-            # Load data
-            logger.info("Loading data...")
-            X_input, y_input = load_data(**get_config(cfg, 'data'))
-
-            # Split data
-            logger.info("Splitting data...")
-            X_train, X_validation, X_test, y_train, y_validation, y_test = split_dataset(X_input, y_input, **get_config(cfg, 'split'))
-
-            # Create model with initial params and create mutable final params for fine tuning
-            logger.info("Loading initial model...")
-            initial_params = get_config(cfg, 'model.params')
-            final_params = copy.deepcopy(initial_params)
-            model = create_model(cfg_model = get_config(cfg, 'model'), params=initial_params)
-
-            # Run tuning if enabled, update final params with tuned values and log final params
-            if get_config(cfg, 'tuning'):
-                logger.info("Tuning model...")
-                tuning_runner = TuningRunner(get_config(cfg, 'tuning'))
-                tuning_params, tuning_artefacts = tuning_runner.run_tuning(model, X_train, y_train, X_validation, y_validation)
-                final_params.update(tuning_params.best_params)
-                tuning_artefacts.log_tuning_artefacts(cfg, logger)
-
-            # Train the model with final params and log model
-            logger.info("Train model...")
-            best_model = create_model(cfg_model = get_config(cfg, 'model'), params=final_params)
-            fit_model(get_config(cfg, 'model'), best_model, X_train, y_train)
-            log_model(get_config(cfg, 'model'), best_model, "model")
-
-            # Evaluate model and log evaluations
-            logger.info("Evaluating model...")
-            metrics_factory = MetricFactory(best_model)
-            metrics = metrics_factory.create_metrics(get_config(cfg, 'evaluate'), X_validation, X_test, y_validation, y_test)
-            mlflow.log_metrics(metrics)
+            cfg, logger, file_handler_path = run_stage_initiate_run(cfg, run)
+            X_input, y_input = run_stage_load_data(logger, cfg)
+            X_train, X_validation, X_test, y_train, y_validation, y_test = run_stage_split_dataset(logger, cfg, X_input, y_input)
+            model, initial_params, final_params = run_stage_initial_model(logger, cfg)
+            final_params = run_stage_tuning(logger, cfg, model, final_params, X_train, y_train, X_validation, y_validation)
+            best_model = run_stage_fit_model(logger, cfg, final_params, X_train, y_train)
+            run_stage_evaluate_model(logger, cfg, best_model, X_validation, X_test, y_validation, y_test)
 
         except Exception:
-            execution_outcome("FAILED", logger, Exception, traceback)
+            log_run_outcome("FAILED", logger, Exception, traceback)
 
         else:
-            execution_outcome("SUCCESS", logger)
+            log_run_outcome("SUCCESS", logger)
 
         finally:
-            finalise_execution(cfg, logger, final_params, file_handler_path)
+            finalise_run(cfg, logger, final_params, file_handler_path)
 
 
 if __name__ == "__main__":
