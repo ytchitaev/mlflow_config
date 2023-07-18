@@ -3,24 +3,25 @@ from typing import Dict, Any
 import lightgbm as lgb
 import mlflow.lightgbm
 
+##### Implement model creation
 
-class LGBMModel(ABC):
+class ModelImplementer(ABC):
     @abstractmethod
     def create(self, params: Dict[str, Any]) -> Any:
         pass
 
 
-class LGBMClassifierModel(LGBMModel):
+class LGBMClassifierModel(ModelImplementer):
     def create(self, params: Dict[str, Any]) -> Any:
         return lgb.LGBMClassifier(**params)
 
 
-class LGBMRegressorModel(LGBMModel):
+class LGBMRegressorModel(ModelImplementer):
     def create(self, params: Dict[str, Any]) -> Any:
         return lgb.LGBMRegressor(**params)
 
 
-class LGBMRankerModel(LGBMModel):
+class LGBMRankerModel(ModelImplementer):
     def create(self, params: Dict[str, Any]) -> Any:
         return lgb.LGBMRanker(**params)
 
@@ -32,8 +33,20 @@ MODELS = {
     # Add more models as needed...
 }
 
+# interface
 
-class ModelImplementer(ABC):
+def create_model(cfg_model: dict, params: Dict[str, Any]) -> Any:
+    library_name, model_name = cfg_model['library_name'], cfg_model['model_name']
+    model_creator = MODELS.get((library_name, model_name))
+    if model_creator is None:
+        raise ValueError(
+            f"Unsupported library name: {library_name} - model name: {model_name}")
+    return model_creator.create(params)
+
+
+##### Implement model fit and logging
+
+class LibraryImplementer(ABC):
     @abstractmethod
     def log_model(self, model: Any, artifact_path: str) -> Any:
         pass
@@ -43,7 +56,7 @@ class ModelImplementer(ABC):
         pass
 
 
-class LightGBMModelImplementer(ModelImplementer):
+class LightGBMLibraryImplementer(LibraryImplementer):
     def log_model(self, model: Any, artifact_path: str) -> Any:
         return mlflow.lightgbm.log_model(model, artifact_path)
 
@@ -55,20 +68,10 @@ class LightGBMModelImplementer(ModelImplementer):
 
 # interface
 
-
-def create_model(cfg_model: dict, params: Dict[str, Any]) -> Any:
-    library_name, model_name = cfg_model['library_name'], cfg_model['model_name']
-    model_creator = MODELS.get((library_name, model_name))
-    if model_creator is None:
-        raise ValueError(
-            f"Unsupported library name: {library_name} - model name: {model_name}")
-    return model_creator.create(params)
-
-
 def fit_model(cfg_model: dict, model, X_train, y_train):
     library_name = cfg_model['library_name']
     if library_name == 'lightgbm':
-        lightgbm_model_implementer = LightGBMModelImplementer()
+        lightgbm_model_implementer = LightGBMLibraryImplementer()
         lightgbm_model_implementer.fit_model(model, X_train, y_train)
     else:
         # Add implementation for other libraries
@@ -77,7 +80,7 @@ def fit_model(cfg_model: dict, model, X_train, y_train):
 def log_model(cfg_model: dict, model, artifact_path: str):
     library_name = cfg_model['library_name']
     if library_name == 'lightgbm':
-        lightgbm_model_implementer = LightGBMModelImplementer()
+        lightgbm_model_implementer = LightGBMLibraryImplementer()
         return lightgbm_model_implementer.log_model(model, artifact_path)
     else:
         # Add implementation for other libraries
