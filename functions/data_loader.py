@@ -8,6 +8,7 @@ from sklearn import datasets
 
 
 class DataLoader(ABC):
+    "abstract base class for specifying data load methods by source"
     def __init__(self):
         self.input_columns = None
         self.output_columns = None
@@ -16,7 +17,7 @@ class DataLoader(ABC):
     def load_data(self, input_columns: List[str], output_columns: List[str], **kwargs) -> Tuple[pd.DataFrame, pd.Series]:
         pass
 
-
+# implementations of specific data load methods by source
 class SklearnDataLoader(DataLoader):
     def load_data(self, input_columns: List[str], output_columns: List[str], dataset_name: str) -> Tuple[pd.DataFrame, pd.Series]:
         load_func = getattr(datasets, f"load_{dataset_name}")
@@ -79,9 +80,8 @@ class AzureSQLDataLoader(DataLoader):
 
 
 def load_data(logger, data_source: str, input_columns: List[str], output_columns: List[str], **kwargs) -> Tuple[pd.DataFrame, pd.Series]:
-    
+    "generic interface for loading data for any data source type"
     logger.info("Loading data...")
-    
     loader_classes = {
         'sklearn': SklearnDataLoader,
         'csv': CSVDataLoader,
@@ -89,10 +89,8 @@ def load_data(logger, data_source: str, input_columns: List[str], output_columns
         #'databricks_delta_lake': DatabricksDeltaLakeDataLoader,
         #'snowflake': SnowflakeDataLoader,
     }
-
     if data_source not in loader_classes:
         raise ValueError(f"Unsupported data source: {data_source}")
-
     loader = loader_classes[data_source]()
     data = loader.load_data(input_columns, output_columns, **kwargs)
     return data

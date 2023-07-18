@@ -12,6 +12,8 @@ class AverageTypes(Enum):
 
 
 class MetricCalculator:
+    "class for defining metric calculatinos"
+
     def __init__(self, model):
         self.model = model
 
@@ -30,6 +32,8 @@ class MetricCalculator:
         return metric_value
 
 class MetricFactory:
+    "class for implementing metric calculations to validation and test datasets"
+
     def __init__(self, model):
         self.model = model
 

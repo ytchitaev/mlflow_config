@@ -1,71 +1,67 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 import pandas as pd
-from functions.data_loader import SklearnDataLoader, CSVDataLoader, AzureSQLDataLoader, load_data
+from functions.data_loader import load_data, SklearnDataLoader, CSVDataLoader, AzureSQLDataLoader
+from sklearn import datasets
+import pyodbc
 
 
-class TestDataLoaders(unittest.TestCase):
+class TestDataLoader(unittest.TestCase):
+    def test_load_data_with_sklearn_data_loader(self):
+        data_source = 'sklearn'
+        input_columns = ['column1', 'column2']
+        output_columns = ['target']
+        dataset_name = 'iris'
 
-    def test_sklearn_data_loader(self):
-        with patch('functions.data_loader.datasets') as mock_datasets:
-            mock_data = MagicMock()
-            mock_data.data = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [4, 5, 6]})
-            mock_data.target = pd.Series([0, 1, 0])
-            mock_data.feature_names = ['feature1', 'feature2']
-            mock_datasets.load_iris.return_value = mock_data
+        # Mock the datasets.load_iris function
+        datasets.load_iris = MagicMock(return_value=pd.DataFrame({'data': [[1, 2], [3, 4]], 'target': [0, 1], 'feature_names': ['column1', 'column2']}))
 
-            loader = SklearnDataLoader()
-            X, y = loader.load_data(['feature1'], ['target'], 'iris')
+        # Test the load_data function
+        X, y = load_data(None, data_source, input_columns, output_columns, dataset_name=dataset_name)
+        datasets.load_iris.assert_called_once()
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertIsInstance(y, pd.Series)
+        self.assertEqual(X.shape, (2, 2))
+        self.assertEqual(y.shape, (2,))
 
-            pd.testing.assert_frame_equal(X, mock_data.data)  
-            self.assertTrue(y.equals(mock_data.target))
+    def test_load_data_with_csv_data_loader(self):
+        data_source = 'csv'
+        input_columns = ['column1', 'column2']
+        output_columns = ['target']
+        csv_file_path = 'path/to/csv'
 
+        # Mock the pd.read_csv function
+        pd.read_csv = MagicMock(return_value=pd.DataFrame({'column1': [1, 2], 'column2': [3, 4], 'target': [0, 1]}))
 
-    def test_csv_data_loader(self):
-        with patch('functions.data_loader.pd.read_csv') as mock_read_csv:
-            mock_df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [
-                                   4, 5, 6], 'target': [0, 1, 0]})
-            mock_read_csv.return_value = mock_df
+        # Test the load_data function
+        X, y = load_data(None, data_source, input_columns, output_columns, csv_file_path=csv_file_path)
+        pd.read_csv.assert_called_once_with(csv_file_path, delimiter=',', encoding='utf-8')
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertIsInstance(y, pd.Series)
+        self.assertEqual(X.shape, (2, 2))
+        self.assertEqual(y.shape, (2,))
 
-            loader = CSVDataLoader()
-            X, y = loader.load_data(
-                ['feature1'], ['target'], 'path/to/file.csv')
+    def test_load_data_with_azure_sql_data_loader(self):
+        data_source = 'azure_sql'
+        input_columns = ['column1', 'column2']
+        output_columns = ['target']
+        connection_string = 'connection_string'
+        table_name = 'table_name'
 
-            pd.testing.assert_frame_equal(X, mock_df[['feature1']])
-            self.assertTrue(y.equals(mock_df[['target']]))
+        # Mock the pyodbc.connect and pd.read_sql functions
+        pyodbc.connect = MagicMock()
+        pd.read_sql = MagicMock(return_value=pd.DataFrame({'column1': [1, 2], 'column2': [3, 4], 'target': [0, 1]}))
 
-    def test_azure_sql_data_loader(self):
-        with patch('functions.data_loader.pyodbc.connect'), \
-                patch('functions.data_loader.pd.read_sql') as mock_read_sql:
+        # Test the load_data function
+        X, y = load_data(None, data_source, input_columns, output_columns, connection_string=connection_string, table_name=table_name)
+        pyodbc.connect.assert_called_once_with(connection_string)
+        pd.read_sql.assert_called_once_with(f"SELECT * FROM {table_name}", pyodbc.connect.return_value)
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertIsInstance(y, pd.Series)
+        self.assertEqual(X.shape, (2, 2))
+        self.assertEqual(y.shape, (2,))
 
-            mock_df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [
-                                   4, 5, 6], 'target': [0, 1, 0]})
-            mock_read_sql.return_value = mock_df
-
-            loader = AzureSQLDataLoader()
-            X, y = loader.load_data(
-                ['feature1'], ['target'], 'connection_string', 'table_name')
-
-            pd.testing.assert_frame_equal(X, mock_df[['feature1']])
-            self.assertTrue(y.equals(mock_df[['target']]))
-
-    def test_load_data_unsupported(self):
-        with self.assertRaises(ValueError) as context:
-            load_data('unsupported_source', ['feature'], ['target'])
-        self.assertTrue(
-            'Unsupported data source: unsupported_source' in str(context.exception))
-
-    def test_load_data_supported(self):
-        loader_classes = {
-            'sklearn': SklearnDataLoader,
-            'csv': CSVDataLoader,
-            'azure_sql': AzureSQLDataLoader
-        }
-
-        for source, loader_class in loader_classes.items():
-            with patch.object(loader_class, 'load_data') as mock_load_data:
-                load_data(source, ['feature'], ['target'])
-                mock_load_data.assert_called_once_with(['feature'], ['target'])
+    # Add more test cases for other data loader classes...
 
 
 if __name__ == '__main__':

@@ -4,10 +4,12 @@ import lightgbm as lgb
 
 
 class ModelCreator(ABC):
+    """generic class for model creation"""
     @abstractmethod
     def create(self, params: Dict[str, Any]) -> Any:
         pass
 
+# lightgbm model implementations
 
 class LGBMClassifierModel(ModelCreator):
     def create(self, params: Dict[str, Any]) -> Any:
@@ -33,6 +35,7 @@ MODELS = {
 
 
 def create_model(cfg_model: dict, params: Dict[str, Any]) -> Any:
+    """generic interface for model creation"""
     library_name, model_name = cfg_model['library_name'], cfg_model['model_name']
     model_creator = MODELS.get((library_name, model_name))
     if model_creator is None:

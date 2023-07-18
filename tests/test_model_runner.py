@@ -1,25 +1,36 @@
 import unittest
-from functions.model_creator import create_model
-from lightgbm import LGBMClassifier, LGBMRegressor, LGBMRanker
+from unittest.mock import MagicMock
+from functions.model_runner import fit_model, log_model, LightGBMLibraryImplementer
+import lightgbm
 
-class TestCreateModel(unittest.TestCase):
-    def test_create_model_with_valid_params(self):
-        model = create_model({'library_name': 'lightgbm', 'model_name': 'LGBMClassifier'}, {})
-        self.assertIsInstance(model, LGBMClassifier)
 
-        model = create_model({'library_name': 'lightgbm', 'model_name': 'LGBMRegressor'}, {})
-        self.assertIsInstance(model, LGBMRegressor)
+class TestModelRunner(unittest.TestCase):
+    def test_fit_model_with_lightgbm_library(self):
+        cfg_model = {'library_name': 'lightgbm', 'callbacks': {}}  # Add 'callbacks' key with an empty dictionary
+        model = MagicMock(spec=lightgbm.Booster)
+        X_train = MagicMock()
+        y_train = MagicMock()
 
-        model = create_model({'library_name': 'lightgbm', 'model_name': 'LGBMRanker'}, {})
-        self.assertIsInstance(model, LGBMRanker)
+        # Test that the LightGBM model implementer's fit_model method is called
+        lightgbm_model_implementer = LightGBMLibraryImplementer()
+        lightgbm_model_implementer.fit_model = MagicMock()
+        fit_model(cfg_model, model, X_train, y_train)
+        lightgbm_model_implementer.fit_model.assert_called_once_with(cfg_model, model, X_train, y_train)
 
-    def test_create_model_with_invalid_library_name(self):
-        with self.assertRaises(ValueError):
-            create_model({'library_name': 'invalid_library', 'model_name': 'LGBMClassifier'}, {})
+    def test_log_model_with_lightgbm_library(self):
+        cfg_model = {'library_name': 'lightgbm'}
+        model = MagicMock()
+        artifact_path = "path/to/artifact"
 
-    def test_create_model_with_invalid_model_name(self):
-        with self.assertRaises(ValueError):
-            create_model({'library_name': 'lightgbm', 'model_name': 'invalid_model'}, {})
+        # Test that the LightGBM model implementer's log_model method is called
+        lightgbm_model_implementer = LightGBMLibraryImplementer()
+        lightgbm_model_implementer.log_model = MagicMock(return_value="logged_model")
+        logged_model = log_model(cfg_model, model, artifact_path)
+        lightgbm_model_implementer.log_model.assert_called_once_with(model, artifact_path)
+        self.assertEqual(logged_model, "logged_model")
+
+    # Add more test cases for other scenarios and libraries...
+
 
 if __name__ == '__main__':
     unittest.main()

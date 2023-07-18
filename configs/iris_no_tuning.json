@@ -39,10 +39,6 @@
       "log_evaluation": {
         "period": 100,
         "show_stdv": true
-      },
-      "early_stopping": {
-        "early_stopping_rounds": 10,
-        "verbose": false
       }
     }
   },
@@ -64,6 +60,5 @@
       }
     },
     "rmse": {}
-  },
-  "artifacts": {}
+  }
 }

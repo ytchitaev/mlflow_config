@@ -18,7 +18,7 @@ def main(cfg: dict):
             X_input, y_input = run_stage_load_data(logger, cfg)
             X_train, X_validation, X_test, y_train, y_validation, y_test = run_stage_split_dataset(logger, cfg, X_input, y_input)
             model, initial_params, final_params = run_stage_initial_model(logger, cfg)
-            final_params = run_stage_tuning(logger, cfg, model, final_params, X_train, y_train, X_validation, y_validation)
+            final_params, cfg = run_stage_tuning(logger, cfg, model, final_params, X_train, y_train, X_validation, y_validation)
             best_model = run_stage_fit_model(logger, cfg, final_params, X_train, y_train)
             run_stage_evaluate_model(logger, cfg, best_model, X_validation, X_test, y_validation, y_test)
 

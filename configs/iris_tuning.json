@@ -34,10 +34,6 @@
       "log_evaluation": {
         "period": 100,
         "show_stdv": true
-      },
-      "early_stopping": {
-        "early_stopping_rounds": 10,
-        "verbose": false
       }
     }
   },
@@ -91,13 +87,5 @@
       }
     },
     "rmse": {}
-  },
-  "artifacts": {
-    "cv_results": {
-      "file_name": "cv_results.csv"
-    },
-    "best_estimator_evals_result": {
-      "file_name": "best_estimator_evals_result.json"
-    }
   }
 }

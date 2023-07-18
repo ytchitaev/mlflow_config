@@ -6,6 +6,7 @@ from utils.file_processor import get_relative_path, check_and_create_path, write
 
 
 def build_execution_config(run, cfg_global: dict) -> dict:
+    "build the execution : {} attribute to be inserted into experiment config"
     experiment_run_path = get_relative_path([cfg_global['mlruns_dir'], run.info.experiment_id, run.info.run_id])
     artifact_path = get_relative_path([experiment_run_path, cfg_global['artifacts_dir']])
     model_path = get_relative_path([artifact_path, cfg_global['artifacts_model_subdir_path']])
@@ -21,6 +22,7 @@ def build_execution_config(run, cfg_global: dict) -> dict:
 
 
 def write_last_config(cfg: dict):
+    "method to write experiment config to output to be picked up by extensions"
     output_path = get_relative_path(get_config(cfg, 'global.outputs_dir'))
     check_and_create_path(output_path)
     last_exec_config_file = get_relative_path([output_path, get_config(cfg, 'global.last_execution_config')])
@@ -29,11 +31,13 @@ def write_last_config(cfg: dict):
 
 
 def setup_experiment(cfg):
+    "initiate experiment name before starting run"
     mlflow.set_experiment(get_config(cfg, 'setup.experiment_name'))
     pass
 
 
 def log_run_outcome(status, logger, exception:Exception=None, traceback:traceback=None):
+    "log the outcome status and exception/traceback if any"
     mlflow.log_param("status", status)
     if exception:
         logger.error(f"Exception occurred during model training: {str(exception)}")
@@ -44,6 +48,7 @@ def log_run_outcome(status, logger, exception:Exception=None, traceback:tracebac
 
 
 def finalise_run(cfg, logger, final_params, file_handler_path):
+    "finalise run by logging modelling outputs, last config for extensions, final parameters, any python logging "
     logger.info(f"{'Final model parameters:' : <25} { {**final_params} }")
     logger.info(f"{'Input columns:' : <25} {get_config(cfg,'data.input_columns')}")
     logger.info(f"{'Output columns:' : <25} {get_config(cfg,'data.output_columns')}")

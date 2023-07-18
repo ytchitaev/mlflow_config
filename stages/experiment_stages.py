@@ -53,11 +53,11 @@ def run_stage_tuning(logger, cfg, model, final_params, X_train, y_train, X_valid
     if get_config(cfg, 'tuning'):
         logger.info("Tuning model...")
         tuning_runner = TuningRunner(get_config(cfg, 'tuning'))
-        tuning_params, tuning_artefacts = tuning_runner.run_tuning(
+        tuning_params, tuning_artifacts = tuning_runner.run_tuning(
             model, X_train, y_train, X_validation, y_validation)
         final_params.update(tuning_params.best_params)
-        tuning_artefacts.log_tuning_artefacts(cfg, logger)
-    return final_params
+        cfg = tuning_artifacts.log_tuning_artifacts(cfg, logger)
+    return final_params, cfg
 
 
 # Train the model with final params and log model
