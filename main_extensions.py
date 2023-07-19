@@ -7,9 +7,9 @@ from extensions.plot_best_estimator_evals_result import ExtensionBestEstimatorEv
 
 def main(cfg: dict, debug: bool):
 
-    ExtensionLGBMTree(cfg=cfg, extension_name="lgbm_tree", debug=debug)
-    ExtensionCVResults(cfg=cfg, extension_name="cv_results", debug=debug)
-    ExtensionBestEstimatorEvalResult(cfg=cfg, extension_name="best_estimator_eval_result", debug=debug)
+    ExtensionLGBMTree(cfg, "lgbm_tree", debug)
+    ExtensionCVResults(cfg, "cv_results", debug)
+    ExtensionBestEstimatorEvalResult(cfg, "best_estimator_eval_result", debug)
 
 if __name__ == "__main__":
 
