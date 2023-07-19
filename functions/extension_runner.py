@@ -1,42 +1,44 @@
-
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Any, Dict
 import matplotlib.pyplot as plt
+
 from utils.config_loader import get_config
-from utils.file_processor import get_relative_path, load_json
-
-class ExtensionFactory:
-    @staticmethod
-    def create_extension(cfg: dict, ext: str, debug: bool):
-        if ext == 'plot_lgbm_tree':
-            return ExtensionType.plot_lgbm_tree(cfg, debug)
-        elif ext == 'plot_best_estimator_evals_result':
-            return ExtensionType.plot_best_estimator_evals_result(cfg, debug)
-        elif ext == 'plot_cv_results':
-            return ExtensionType.plot_cv_results(cfg, debug)
-        else:
-            raise ValueError(f"Unknown extension: {ext}")
+from utils.image_processor import ImageFormat, save_image, show_image
 
 
-class ExtensionType:
+@dataclass
+class ExtensionImplementation(ABC):
+    """Generic base class for extensions implementations"""
+    cfg: Dict[str, Any]
+    extension_name: str
+    debug: bool
 
-    @staticmethod
-    def plot_lgbm_tree(cfg: dict, debug: bool):
-        # Implement the logic for plot_lgbm_tree extension
+    @abstractmethod
+    def check_extension_viability(self, cfg: dict) -> bool:
         pass
 
-    @staticmethod
-    def plot_best_estimator_evals_result(cfg: dict):
-        best_estimator_evals_result = load_json(get_relative_path(get_config(cfg, 'execution.artifact_path'), "best_estimator_evals_result.json"))
-        plt.figure(figsize=(10, 6))
-        for metric_name, scores in best_estimator_evals_result["validation"].items():
-            x = range(len(scores))
-            plt.plot(x, scores, label=metric_name)
-        plt.xlabel('Hyperparameter Combination')
-        plt.ylabel('Metric Score')
-        plt.title('Evaluation Results')
-        plt.legend()
-        return plt
-
-    @staticmethod
-    def plot_cv_results(cfg: dict, debug: bool):
-        # Implement the logic for plot_cv_results extension
+    @abstractmethod
+    def load_extension(self, cfg: dict) -> Any:
         pass
+
+    @abstractmethod
+    def plot_extension(self, data: Any) -> plt.figure:
+        pass
+
+    """Methods on init and common method implementation"""
+
+    def __post_init__(self):
+        if self.check_extension_viability(self.cfg):
+            data = self.load_extension(self.cfg)
+            plt_figure = self.plot_extension(data)
+            self.full_output_path = self.write_extension(plt_figure)
+            self.show_extension(self.full_output_path) if self.debug else None
+
+    def write_extension(self, plt_figure: plt.figure) -> str:
+        output_path = get_config(self.cfg, 'execution.artifact_path')
+        return save_image(plt_figure, output_path, self.extension_name, ImageFormat.PNG)
+
+    def show_extension(self, image_path: str):
+        if self.debug:
+            show_image(image_path)

@@ -5,6 +5,7 @@ python C:\git\mlflow_config\cgpt\print_files.py `
 --ignore *\functions\__pycache__* *\utils\__pycache__* *\extensions\__pycache__* *\env* `
 --list_files `
 --write
+
 # exclude github actions
 python C:\git\mlflow_config\cgpt\print_files.py `
 --start_directory C:\git\mlflow_config\ `
@@ -12,10 +13,19 @@ python C:\git\mlflow_config\cgpt\print_files.py `
 --ignore *\functions\__pycache__* *\utils\__pycache__* *\extensions\__pycache__* *\env* `
 --list_files `
 --write
+
 # extensions only
 python C:\git\mlflow_config\cgpt\print_files.py `
 --start_directory C:\git\mlflow_config\ `
---filter *utils\* *extensions\* *outputs\* *main_extensions.py `
+--filter *utils\* *extensions\* *outputs\* *functions\* *main_extensions.py `
+--ignore *\functions\__pycache__* *\utils\__pycache__* *\extensions\__pycache__* *\env* `
+--list_files `
+--write
+
+# debug
+python C:\git\mlflow_config\cgpt\print_files.py `
+--start_directory C:\git\mlflow_config\ `
+--filter *utils\* *extensions\* *outputs\* *functions\extension_runner.py* *main_extensions.py `
 --ignore *\functions\__pycache__* *\utils\__pycache__* *\extensions\__pycache__* *\env* `
 --list_files `
 --write

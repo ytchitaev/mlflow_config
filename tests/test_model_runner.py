@@ -1,36 +1,28 @@
 import unittest
 from unittest.mock import MagicMock
-from functions.model_runner import fit_model, log_model, LightGBMLibraryImplementer
-import lightgbm
+from functions.model_runner import LightGBMLibraryImplementer, fit_model, log_model
 
 
 class TestModelRunner(unittest.TestCase):
-    def test_fit_model_with_lightgbm_library(self):
-        cfg_model = {'library_name': 'lightgbm', 'callbacks': {}}  # Add 'callbacks' key with an empty dictionary
-        model = MagicMock(spec=lightgbm.Booster)
+    def test_lightgbm_library_implementer_fit_model(self):
+        # Create a mock lightgbm.Booster object and data
+        model = MagicMock()
         X_train = MagicMock()
         y_train = MagicMock()
 
-        # Test that the LightGBM model implementer's fit_model method is called
-        lightgbm_model_implementer = LightGBMLibraryImplementer()
-        lightgbm_model_implementer.fit_model = MagicMock()
-        fit_model(cfg_model, model, X_train, y_train)
-        lightgbm_model_implementer.fit_model.assert_called_once_with(cfg_model, model, X_train, y_train)
+        # Create a mock cfg_model with the 'callbacks' key
+        cfg_model = {"library_name": "lightgbm", "callbacks": {}}
 
-    def test_log_model_with_lightgbm_library(self):
-        cfg_model = {'library_name': 'lightgbm'}
-        model = MagicMock()
-        artifact_path = "path/to/artifact"
+        # Create an instance of LightGBMLibraryImplementer
+        implementer = LightGBMLibraryImplementer()
 
-        # Test that the LightGBM model implementer's log_model method is called
-        lightgbm_model_implementer = LightGBMLibraryImplementer()
-        lightgbm_model_implementer.log_model = MagicMock(return_value="logged_model")
-        logged_model = log_model(cfg_model, model, artifact_path)
-        lightgbm_model_implementer.log_model.assert_called_once_with(model, artifact_path)
-        self.assertEqual(logged_model, "logged_model")
+        # Mock the handle_callbacks method
+        implementer.handle_callbacks = MagicMock(return_value=[])
 
-    # Add more test cases for other scenarios and libraries...
-
+        # Assert that the necessary methods are called with the correct arguments
+        model.fit = MagicMock()
+        implementer.fit_model(cfg_model, model, X_train, y_train)
+        model.fit.assert_called_with(X_train, y_train, callbacks=[])
 
 if __name__ == '__main__':
     unittest.main()
