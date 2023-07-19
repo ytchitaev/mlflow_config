@@ -8,5 +8,5 @@
         "test_percentage": 10,
         "random_state": 42
     },
-    "artifacts": {}
+    "artifacts": []
 }

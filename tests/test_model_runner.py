@@ -1,25 +1,28 @@
 import unittest
-from functions.model_runner import create_model
-from lightgbm import LGBMClassifier, LGBMRegressor, LGBMRanker
+from unittest.mock import MagicMock
+from functions.model_runner import LightGBMLibraryImplementer, fit_model, log_model
 
-class TestCreateModel(unittest.TestCase):
-    def test_create_model_with_valid_params(self):
-        model = create_model({'library_name': 'lightgbm', 'model_name': 'LGBMClassifier'}, {})
-        self.assertIsInstance(model, LGBMClassifier)
 
-        model = create_model({'library_name': 'lightgbm', 'model_name': 'LGBMRegressor'}, {})
-        self.assertIsInstance(model, LGBMRegressor)
+class TestModelRunner(unittest.TestCase):
+    def test_lightgbm_library_implementer_fit_model(self):
+        # Create a mock lightgbm.Booster object and data
+        model = MagicMock()
+        X_train = MagicMock()
+        y_train = MagicMock()
 
-        model = create_model({'library_name': 'lightgbm', 'model_name': 'LGBMRanker'}, {})
-        self.assertIsInstance(model, LGBMRanker)
+        # Create a mock cfg_model with the 'callbacks' key
+        cfg_model = {"library_name": "lightgbm", "callbacks": {}}
 
-    def test_create_model_with_invalid_library_name(self):
-        with self.assertRaises(ValueError):
-            create_model({'library_name': 'invalid_library', 'model_name': 'LGBMClassifier'}, {})
+        # Create an instance of LightGBMLibraryImplementer
+        implementer = LightGBMLibraryImplementer()
 
-    def test_create_model_with_invalid_model_name(self):
-        with self.assertRaises(ValueError):
-            create_model({'library_name': 'lightgbm', 'model_name': 'invalid_model'}, {})
+        # Mock the handle_callbacks method
+        implementer.handle_callbacks = MagicMock(return_value=[])
+
+        # Assert that the necessary methods are called with the correct arguments
+        model.fit = MagicMock()
+        implementer.fit_model(cfg_model, model, X_train, y_train)
+        model.fit.assert_called_with(X_train, y_train, callbacks=[])
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,3 +1,18 @@
+# Notes
+- can have various orchestrators that are pre-set for certain mdoels
+- improve how extensions are processed, need a way to track artifacts - maybe write to config?
+- artifacts in config are currently unused, either build this dynamically per above or remove
+- callbacks are not currently implemented, either remove from config or adapt
+
+Add support for:
+{
+"early_stopping": {
+"stopping_rounds": 10,
+"verbose": false
+}
+
+# Notes
+- /function/*file should be grouped by an executing input - in future these can be orchestrated as required
 # LATEST
 
 - TODO - log artifacts should be made dynamic log_all_artifacts()

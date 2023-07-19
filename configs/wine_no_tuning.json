@@ -1,6 +1,11 @@
 {
   "setup": {
-    "experiment_name": "Wine sklearn regression - no tuning"
+    "experiment_name": "Wine sklearn regression - no tuning",
+    "tags": {
+      "environment": "production",
+      "team": "data-science",
+      "model_version": "1.0"
+    }
   },
   "data": {
     "data_source": "sklearn",
@@ -40,11 +45,14 @@
       "feature_fraction": 0.5,
       "bagging_fraction": 0.5
     },
-    "callbacks": {}
+    "callbacks": {
+      "log_evaluation": {
+        "period": 100,
+        "show_stdv": true
+      }
+    }
   },
   "evaluate": {
     "rmse": {}
-  },
-  "artifacts": {
   }
 }

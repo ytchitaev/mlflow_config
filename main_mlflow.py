@@ -1,97 +1,35 @@
 import argparse
 import traceback
-import copy
-from typing import Type
-
 import mlflow
-import mlflow.lightgbm
-import lightgbm as lgb
 
-from utils.config_loader import combine_configs, get_config
+from utils.config_loader import combine_configs
 from utils.file_processor import load_json, get_relative_path
-from functions.execution_manager import build_execution_config, write_last_config
-from functions.python_logger import init_python_logger
-from functions.mlflow_artifact_logger import mlflow_log_artifact_dict_to_csv, mlflow_log_artifact_dict_to_json
-from functions.data_loader import load_data
-from functions.data_splitter import split_dataset
-from functions.model_runner import create_model
-from functions.tuning_runner import TuningRunner, TuningResult
-from functions.metrics_evaluator import MetricFactory
+from functions.run_manager import setup_experiment, finalise_run, log_run_outcome
+from stages.experiment_stages import *
 
 
 def main(cfg: dict):
 
-    mlflow.set_experiment(get_config(cfg, 'setup.experiment_name'))
+    setup_experiment(cfg)
     with mlflow.start_run() as run:
 
         try:
+            cfg, logger, file_handler_path = run_stage_initiate_run(cfg, run)
+            X_input, y_input = run_stage_load_data(logger, cfg)
+            X_train, X_validation, X_test, y_train, y_validation, y_test = run_stage_split_dataset(logger, cfg, X_input, y_input)
+            model, initial_params, final_params = run_stage_initial_model(logger, cfg)
+            final_params, cfg = run_stage_tuning(logger, cfg, model, final_params, X_train, y_train, X_validation, y_validation)
+            best_model = run_stage_fit_model(logger, cfg, final_params, X_train, y_train)
+            run_stage_evaluate_model(logger, cfg, best_model, X_validation, X_test, y_validation, y_test)
 
-            # Add execution to config and record as artifact, init python logger
-            exec_cfg = build_execution_config(run, get_config(cfg, 'global'))
-            cfg = combine_configs(cfg, exec_cfg)
-            logger, file_handler_path = init_python_logger(cfg)
-            mlflow_log_artifact_dict_to_json(cfg, get_config(cfg, 'global.config_file_name'), get_config(cfg))
-            logger.info(f"Started run: {get_config(cfg, 'execution.experiment_run_path')}")
-
-            # Load data
-            logger.info("Loading data...")
-            X_input, y_input = load_data(**get_config(cfg, 'data'))
-
-            # Split data
-            logger.info("Splitting data...")
-            X_train, X_validation, X_test, y_train, y_validation, y_test = split_dataset(X_input, y_input, **get_config(cfg, 'split'))
-
-            # Create model with initial params and create mutable final params for fine tuning
-            logger.info("Loading initial model...")
-            initial_params = get_config(cfg, 'model.params')
-            final_params = copy.deepcopy(initial_params)
-            model = create_model(cfg_model = get_config(cfg, 'model'), params=initial_params)
-
-            # Run tuning if enabled, update final params with tuned values and log final params
-            if get_config(cfg, 'tuning'):
-                logger.info("Tuning model...")
-                tuning_runner = TuningRunner(get_config(cfg, 'tuning.name'), get_config(cfg, 'tuning.params'))
-                tuning_result: Type[TuningResult] = tuning_runner.run_tuning(model, X_train, y_train, X_validation, y_validation)
-                final_params.update(tuning_result.best_params)
-
-                if get_config(cfg, 'artifacts.cv_results'):
-                    logger.info("Logging cv_results artifact...")
-                    mlflow_log_artifact_dict_to_csv(cfg, get_config(cfg, 'artifacts.cv_results.file_name'), tuning_result.cv_results)
-
-                if tuning_result.best_estimator_evals_result:
-                    logger.info("Logging best_estimator_evals_result artifact...")
-                    mlflow_log_artifact_dict_to_json(cfg, get_config(cfg, 'artifacts.best_estimator_evals_result.file_name'), tuning_result.best_estimator_evals_result)
-
-            # Train the model with final params and log model
-            logger.info("Training model...")
-            best_model = create_model(cfg_model = get_config(cfg, 'model'), params=final_params)
-            best_model.fit(X_train, y_train, callbacks=[lgb.log_evaluation(period=100, show_stdv=True)])
-            mlflow.lightgbm.log_model(best_model, "model")
-
-            # Evaluate model and log evaluations
-            logger.info("Evaluating model...")
-            metrics_factory = MetricFactory(best_model)
-            metrics = metrics_factory.create_metrics(get_config(cfg, 'evaluate'), X_validation, X_test, y_validation, y_test)
-            [mlflow.log_metric(metric_name, metric_value) for metric_name, metric_value in metrics.items()]
-
-        except Exception as e:
-            mlflow.log_param("status", "FAILED")
-            logger.error(f"Exception occurred during model training: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+        except Exception:
+            log_run_outcome("FAILED", logger, Exception, traceback)
 
         else:
-            mlflow.log_param("status", "SUCCESS")
-            logger.info(f"Model run completed.")
+            log_run_outcome("SUCCESS", logger)
 
         finally:
-            logger.info(f"{'Input columns:' : <25} {get_config(cfg,'data.input_columns')}")
-            logger.info(f"{'Output columns:' : <25} {get_config(cfg,'data.output_columns')}")
-            logger.info(f"{'Model full path:' : <25} {get_config(cfg, 'execution.model_path')}")
-            logger.info(f"{'Final model parameters:' : <25} { {**final_params} }")
-            logger.info(f"{'Finished run:' : <25} {get_config(cfg, 'execution.experiment_run_path')}")
-            write_last_config(cfg)
-            mlflow.log_params(final_params)
-            mlflow.log_artifact(file_handler_path)
+            finalise_run(cfg, logger, final_params, file_handler_path)
 
 
 if __name__ == "__main__":

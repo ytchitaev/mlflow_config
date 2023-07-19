@@ -1,34 +1,61 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
-from lightgbm import LGBMClassifier, LGBMRegressor, LGBMRanker
+from typing import Any, List
+import lightgbm
+import mlflow.lightgbm
 
-class Model(ABC):
+
+class LibraryImplementer(ABC):
+    "abstract base class definition for model fit and model logging"
     @abstractmethod
-    def create(self, params: Dict[str, Any]) -> Any:
+    def log_model(self, model: Any, artifact_path: str) -> Any:
         pass
 
-class LGBMClassifierModel(Model):
-    def create(self, params: Dict[str, Any]) -> Any:
-        return LGBMClassifier(**params)
+    @abstractmethod
+    def fit_model(self, cfg_model: dict, model: Any, X_train: Any, y_train: Any) -> Any:
+        pass
 
-class LGBMRegressorModel(Model):
-    def create(self, params: Dict[str, Any]) -> Any:
-        return LGBMRegressor(**params)
 
-class LGBMRankerModel(Model):
-    def create(self, params: Dict[str, Any]) -> Any:
-        return LGBMRanker(**params)
+class LightGBMLibraryImplementer(LibraryImplementer):
+    def log_model(self, model: Any, artifact_path: str) -> Any:
+        "lightgbm implementation of model logging"
+        return mlflow.lightgbm.log_model(model, artifact_path)
 
-MODELS = {
-    ("lightgbm", "LGBMClassifier"): LGBMClassifierModel(),
-    ("lightgbm", "LGBMRegressor"): LGBMRegressorModel(),
-    ("lightgbm", "LGBMRanker"): LGBMRankerModel(),
-    # Add more models as needed...
-}
+    def handle_callbacks(self, cfg_model: dict) -> List:
+        "dynamically handle callbacks e.g. lightgbm.log_evaluation(period=100, show_stdv=True)"
+        callbacks = []
+        callbacks_config = cfg_model["callbacks"]
+        for callback_name, callback_args in callbacks_config.items():
+            callback_module = __import__("lightgbm", fromlist=[callback_name])
+            callback = getattr(callback_module, callback_name)
+            callback_obj = callback(**callback_args)
+            callbacks.append(callback_obj)
+        return callbacks
 
-def create_model(cfg_model: dict, params: Dict[str, Any]) -> Any:
-    library_name, model_name = cfg_model['library_name'], cfg_model['model_name']
-    model_creator = MODELS.get((library_name, model_name))
-    if model_creator is None:
-        raise ValueError(f"Unsupported library name: {library_name} - model name: {model_name}")
-    return model_creator.create(params)
+    def fit_model(self, cfg_model: dict, model: Any, X_train: Any, y_train: Any) -> Any:
+        "lightgbm implementation of model fit"
+        callbacks = self.handle_callbacks(cfg_model)
+        if isinstance(model, lightgbm.Booster):
+            callbacks.append(mlflow.lightgbm.callbacks.LGBMLogger())
+        model.fit(X_train, y_train, callbacks=callbacks)
+
+
+def fit_model(cfg_model: dict, model, X_train, y_train):
+    "generic interface for fitting a model"
+    library_name = cfg_model['library_name']
+    if library_name == 'lightgbm':
+        lightgbm_model_implementer = LightGBMLibraryImplementer()
+        lightgbm_model_implementer.fit_model(cfg_model, model, X_train, y_train)
+    else:
+        # Add implementation for other libraries
+        pass
+
+
+def log_model(cfg_model: dict, model, artifact_path: str):
+    "generic interface for logging model"
+    library_name = cfg_model['library_name']
+    if library_name == 'lightgbm':
+        lightgbm_model_implementer = LightGBMLibraryImplementer()
+        return lightgbm_model_implementer.log_model(model, artifact_path)
+    else:
+        # Add implementation for other libraries
+        pass
