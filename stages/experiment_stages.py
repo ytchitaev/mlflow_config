@@ -4,7 +4,7 @@ import mlflow
 from utils.config_loader import get_config, combine_configs
 
 from loggers.mlflow_artifact_logger import mlflow_log_artifact_dict_to_json
-from loggers.python_logger import init_python_logger
+from loggers.python_logger import LoggingTypes, init_python_logger
 
 from functions.run_manager import build_execution_config 
 from functions.data_loader import load_data
@@ -19,7 +19,7 @@ from functions.metrics_evaluator import MetricFactory
 def run_stage_initiate_run(cfg: dict, run):
     exec_cfg = build_execution_config(run, get_config(cfg, 'global'))
     cfg = combine_configs(cfg, exec_cfg)
-    logger, file_handler_path = init_python_logger(cfg)
+    logger, file_handler_path = init_python_logger(cfg, LoggingTypes.MLFLOW)
     [mlflow.set_tag(key, value) for key, value in get_config(cfg, 'setup.tags').items()]
     mlflow_log_artifact_dict_to_json(cfg, get_config(cfg, 'global.config_file_name'), get_config(cfg))
     logger.info(f"Started run: {get_config(cfg, 'execution.experiment_run_path')}")

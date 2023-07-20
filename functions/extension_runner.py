@@ -10,34 +10,38 @@ from utils.image_processor import ImageFormat, save_image, show_image
 @dataclass
 class ExtensionImplementation(ABC):
     """Generic base class for extensions implementations"""
+    logger: Any
     cfg: Dict[str, Any]
     extension_name: str
     debug: bool
+    plt_figure: plt.figure = None
 
     @abstractmethod
-    def check_extension_viability(self, cfg: dict) -> bool:
-        pass
+    def check_extension_viability(self) -> bool:
+        ...
 
     @abstractmethod
-    def load_extension(self, cfg: dict) -> Any:
-        pass
+    def load_extension(self) -> Any:
+        ...
 
     @abstractmethod
     def plot_extension(self, data: Any) -> plt.figure:
-        pass
-
-    """Methods on init and common method implementation"""
+        ...
 
     def __post_init__(self):
-        if self.check_extension_viability(self.cfg):
-            data = self.load_extension(self.cfg)
-            plt_figure = self.plot_extension(data)
-            self.full_output_path = self.write_extension(plt_figure)
-            self.show_extension(self.full_output_path) if self.debug else None
+        "process extension activities"
+        if self.check_extension_viability():
+            data = self.load_extension()
+            self.plt_figure = self.plot_extension(data)
+            self.full_output_path = self.write_extension()
+            if self.debug:
+                self.show_extension(self.full_output_path)
 
-    def write_extension(self, plt_figure: plt.figure) -> str:
+    def write_extension(self) -> str:
+        "generic write function from matplotlib.pyplot plt"
         output_path = get_config(self.cfg, 'execution.artifact_path')
-        return save_image(plt_figure, output_path, self.extension_name, ImageFormat.PNG)
+        full_output_path = save_image(self.logger, self.plt_figure, output_path, self.extension_name, ImageFormat.PNG)
+        return full_output_path
 
     def show_extension(self, image_path: str):
         if self.debug:

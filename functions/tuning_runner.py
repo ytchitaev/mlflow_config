@@ -24,11 +24,11 @@ class TuningArtifacts:
         if self.cv_results:
             logger.info("Logging cv_results artifact...")
             mlflow_log_artifact_dict_to_csv(cfg, "cv_results.csv", self.cv_results)
-            cfg = self.add_artifact_to_config(cfg, "cv_results")
+            cfg = self.add_artifact_to_config(cfg, "cv_results.csv")
         if self.best_estimator_evals_result:
             logger.info("Logging best_estimator_evals_result artifact...")
             mlflow_log_artifact_dict_to_json(cfg, "best_estimator_evals_result.json", self.best_estimator_evals_result)
-            cfg = self.add_artifact_to_config(cfg, "best_estimator_evals_result")
+            cfg = self.add_artifact_to_config(cfg, "best_estimator_evals_result.json")
         return cfg
 
     def add_artifact_to_config(self, cfg, artifact_name):

@@ -1,3 +1,15 @@
+# Notes2
+
+- create_model in model_creator should be ModelCreator class, fit_model, log_model should be functions of the class
+- Reduce hard coding of extension name between main_extensions and the plot_commands.
+- Look at generalising load json / load csv back to the extension_runner main function
+- Look at recording artifacts like this to allow individually storing name and extension separately
+
+artifacts": {
+        "cv_results" : {"extension" : "csv"},
+        "best_estimator_evals_result" : {"extension" : "json"}
+    }
+
 # Notes
 - can have various orchestrators that are pre-set for certain mdoels
 - improve how extensions are processed, need a way to track artifacts - maybe write to config?
