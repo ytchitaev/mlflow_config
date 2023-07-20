@@ -10,11 +10,11 @@ from functions.extension_runner import ExtensionImplementation
 class ExtensionLGBMTree(ExtensionImplementation):
     """Extension implementation for plotting LightGBM tree"""
 
-    def check_extension_viability(self, cfg: dict) -> bool:
-        return get_config(cfg, 'model.library_name') == 'lightgbm'
+    def check_extension_viability(self) -> bool:
+        return get_config(self.cfg, 'model.library_name') == 'lightgbm'
 
-    def load_extension(self, cfg: dict) -> Any:
-        model_path = get_config(cfg, 'execution.model_path')
+    def load_extension(self) -> Any:
+        model_path = get_config(self.cfg, 'execution.model_path')
         return joblib.load(model_path)
 
     def plot_extension(self, data: Any) -> plt.figure:

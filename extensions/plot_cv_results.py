@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+from typing import Any
 
 from utils.file_processor import load_csv, get_relative_path
 from utils.config_loader import get_config, is_list_item_in_dict
@@ -9,13 +10,13 @@ from functions.extension_runner import ExtensionImplementation
 class ExtensionCVResults(ExtensionImplementation):
     """Extension implementation for plotting cross-validation results"""
 
-    def check_extension_viability(self, cfg):
-        return is_list_item_in_dict('cv_results', cfg['artifacts'])
+    def check_extension_viability(self):
+        return is_list_item_in_dict('cv_results.csv', self.cfg['artifacts'])
 
-    def load_extension(self, cfg) -> pd.DataFrame:
-        return load_csv(get_relative_path(get_config(cfg, 'execution.artifact_path'), "cv_results.csv"))
+    def load_extension(self) -> pd.DataFrame:
+        return load_csv(get_relative_path(get_config(self.cfg, 'execution.artifact_path'), "cv_results.csv"))
 
-    def plot_extension(self, data):
+    def plot_extension(self, data: Any):
         mean_train_scores = data['mean_train_score']
         mean_validation_scores = data['mean_test_score']
         plt.figure(figsize=(10, 6))
