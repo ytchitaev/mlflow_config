@@ -7,10 +7,10 @@ from loggers.mlflow_artifact_logger import mlflow_log_artifact_dict_to_json
 from loggers.python_logger import LoggingTypes, init_python_logger
 
 from functions.run_manager import build_execution_config 
-from functions.data_loader import load_data
-from functions.data_splitter import split_dataset
-from functions.model_creator import create_model
-from functions.model_runner import fit_model, log_model
+from functions.data_loader import DataLoaderManager
+from functions.data_splitter import DatasetSplitter
+from functions.model_creator import ModelFactory 
+from functions.model_runner import ModelManager
 from functions.tuning_runner import TuningRunner
 from functions.metrics_evaluator import MetricFactory
 
@@ -28,13 +28,13 @@ def run_stage_initiate_run(cfg: dict, run):
 
 # load x, y data objects from data source based on config
 def run_stage_load_data(logger, cfg):
-    X_input, y_input = load_data(logger, **get_config(cfg, 'data'))
+    X_input, y_input = DataLoaderManager.load_data(logger, **get_config(cfg, 'data'))
     return X_input, y_input
 
 
 # split data into train, validation, test based on config
 def run_stage_split_dataset(logger, cfg, X_input, y_input):
-    X_train, X_validation, X_test, y_train, y_validation, y_test = split_dataset(
+    X_train, X_validation, X_test, y_train, y_validation, y_test = DatasetSplitter.split_dataset(
                 logger, X_input, y_input, **get_config(cfg, 'split'))
     return X_train, X_validation, X_test, y_train, y_validation, y_test
 
@@ -44,7 +44,7 @@ def run_stage_initial_model(logger, cfg):
     logger.info("Loading initial model and config params...")
     initial_params = get_config(cfg, 'model.params')
     final_params = copy.deepcopy(initial_params)
-    model = create_model(cfg_model=get_config(
+    model = ModelFactory.create_model(cfg_model=get_config(
         cfg, 'model'), params=initial_params)
     return model, initial_params, final_params
 
@@ -63,10 +63,10 @@ def run_stage_tuning(logger, cfg, model, final_params, X_train, y_train, X_valid
 # Train the model with final params and log model
 def run_stage_fit_model(logger, cfg, final_params, X_train, y_train):
     logger.info("Train model...")
-    best_model = create_model(cfg_model=get_config(
+    best_model = ModelFactory.create_model(cfg_model=get_config(
         cfg, 'model'), params=final_params)
-    fit_model(get_config(cfg, 'model'), best_model, X_train, y_train)
-    log_model(get_config(cfg, 'model'), best_model, "model")
+    ModelManager.fit_model(get_config(cfg, 'model'), best_model, X_train, y_train)
+    ModelManager.log_model(get_config(cfg, 'model'), best_model, "model")
     return best_model
 
 

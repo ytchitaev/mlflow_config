@@ -39,23 +39,23 @@ class LightGBMLibraryImplementer(LibraryImplementer):
         model.fit(X_train, y_train, callbacks=callbacks)
 
 
-def fit_model(cfg_model: dict, model, X_train, y_train):
-    "generic interface for fitting a model"
-    library_name = cfg_model['library_name']
-    if library_name == 'lightgbm':
-        lightgbm_model_implementer = LightGBMLibraryImplementer()
-        lightgbm_model_implementer.fit_model(cfg_model, model, X_train, y_train)
-    else:
-        # Add implementation for other libraries
-        pass
+class ModelManager:
+    @staticmethod
+    def fit_model(cfg_model: dict, model, X_train, y_train):
+        library_name = cfg_model['library_name']
+        library_implementer = ModelManager._create_library_implementer(library_name)
+        library_implementer.fit_model(cfg_model, model, X_train, y_train)
 
+    @staticmethod
+    def log_model(cfg_model: dict, model, artifact_path: str):
+        library_name = cfg_model['library_name']
+        library_implementer = ModelManager._create_library_implementer(library_name)
+        return library_implementer.log_model(model, artifact_path)
 
-def log_model(cfg_model: dict, model, artifact_path: str):
-    "generic interface for logging model"
-    library_name = cfg_model['library_name']
-    if library_name == 'lightgbm':
-        lightgbm_model_implementer = LightGBMLibraryImplementer()
-        return lightgbm_model_implementer.log_model(model, artifact_path)
-    else:
-        # Add implementation for other libraries
-        pass
+    @staticmethod
+    def _create_library_implementer(library_name: str) -> LibraryImplementer:
+        if library_name == 'lightgbm':
+            return LightGBMLibraryImplementer()
+        else:
+            # Add implementation for other libraries
+            pass

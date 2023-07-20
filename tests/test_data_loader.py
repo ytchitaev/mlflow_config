@@ -2,14 +2,8 @@ import unittest
 from unittest.mock import MagicMock
 import pandas as pd
 import pyodbc
-from sklearn import datasets
 from pandas._testing import assert_frame_equal, assert_series_equal
-from functions.data_loader import (
-    load_data,
-    SklearnDataLoader,
-    CSVDataLoader,
-    AzureSQLDataLoader,
-)
+from functions.data_loader import CSVDataLoader, AzureSQLDataLoader
 
 
 class TestDataLoader(unittest.TestCase):
@@ -35,7 +29,7 @@ class TestDataLoader(unittest.TestCase):
             input_columns, output_columns, csv_file_path)
 
         assert_frame_equal(X, df[input_columns])
-        assert_frame_equal(y, df[output_columns])
+        assert_series_equal(y, df[output_columns])
 
     def test_azure_sql_data_loader(self):
         data_loader = AzureSQLDataLoader()
@@ -60,7 +54,7 @@ class TestDataLoader(unittest.TestCase):
             input_columns, output_columns, connection_string, table_name)
 
         assert_frame_equal(X, df[input_columns])
-        assert_frame_equal(y, df[output_columns])
+        assert_series_equal(y, df[output_columns])
 
 
 if __name__ == '__main__':

@@ -79,18 +79,20 @@ class AzureSQLDataLoader(DataLoader):
 #        return X, y
 
 
-def load_data(logger, data_source: str, input_columns: List[str], output_columns: List[str], **kwargs) -> Tuple[pd.DataFrame, pd.Series]:
-    "generic interface for loading data for any data source type"
-    logger.info("Loading data...")
-    loader_classes = {
-        'sklearn': SklearnDataLoader,
-        'csv': CSVDataLoader,
-        'azure_sql': AzureSQLDataLoader #,
-        #'databricks_delta_lake': DatabricksDeltaLakeDataLoader,
-        #'snowflake': SnowflakeDataLoader,
-    }
-    if data_source not in loader_classes:
-        raise ValueError(f"Unsupported data source: {data_source}")
-    loader = loader_classes[data_source]()
-    data = loader.load_data(input_columns, output_columns, **kwargs)
-    return data
+class DataLoaderManager:
+    @staticmethod
+    def load_data(logger, data_source: str, input_columns: List[str], output_columns: List[str], **kwargs) -> Tuple[pd.DataFrame, pd.Series]:
+        "generic interface for loading data for any data source type"
+        logger.info("Loading data...")
+        loader_classes = {
+            'sklearn': SklearnDataLoader,
+            'csv': CSVDataLoader,
+            'azure_sql': AzureSQLDataLoader #,
+            #'databricks_delta_lake': DatabricksDeltaLakeDataLoader,
+            #'snowflake': SnowflakeDataLoader,
+        }
+        if data_source not in loader_classes:
+            raise ValueError(f"Unsupported data source: {data_source}")
+        loader = loader_classes[data_source]()
+        data = loader.load_data(input_columns, output_columns, **kwargs)
+        return data
