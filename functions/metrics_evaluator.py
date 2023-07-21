@@ -37,6 +37,7 @@ class MetricFactory:
     def __init__(self, model):
         self.model = model
 
+    
     def create_metrics(self, config, X_validation, X_test, y_validation, y_test):
         metrics_dict = {}
 
