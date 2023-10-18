@@ -1,3 +1,26 @@
+# 2023-08-02
+ - https://chat.openai.com/share/fb0c46b8-b859-4bd7-a653-8818cb9a37e1
+ - https://bytepawn.com/automatic-mlflow-logging-for-pytorch.html 
+ - Not config driven
+ - Use functions as generalisable functions, but don't use config file
+ - Don't write execution data to config, just use the mlflow run ids
+ - Could still use metrics evaluator for non autolog outputs
+ - Could still use extensions but need to somehow confirm that related artefacts / python objects are created
+ - Tuning runner is probably not necessary, can simply create examples to copy
+
+
+# Notes3
+
+- Stages could be a classmethod function e.g. Stage.initiate_run() instead of run_stage_initiate_run()
+    - https://chat.openai.com/share/40fc1b06-78e5-4a2a-b6f6-4180035061aa
+- Redo as initial scope:
+    - Keep stages:
+        - Stage.setup_experiment() - before with mlflow.start_run(), init autolog and run set_experiment()
+        - Stage.initiate_run() - create python logger, setup tags, log configs
+        - Stage.load_data()
+        - Stage.split_data()
+    - Move into a separate py:
+        - 
 # Notes2
 
 - create_model in model_creator should be ModelCreator class, fit_model, log_model should be functions of the class

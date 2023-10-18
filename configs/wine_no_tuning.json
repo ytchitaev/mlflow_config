@@ -39,6 +39,8 @@
     "library_name": "lightgbm",
     "model_name": "LGBMRegressor",
     "params": {
+      "objective": "regression",
+      "metric": "rmse",
       "boosting_type": "gbdt",
       "num_leaves": 20,
       "learning_rate": 0.01,

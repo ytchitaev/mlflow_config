@@ -29,7 +29,11 @@
   "model": {
     "library_name": "lightgbm",
     "model_name": "LGBMClassifier",
-    "params": {},
+    "params": {
+      "objective": "multiclass",
+      "num_class": 3,
+      "metric": "multi_logloss"
+    },
     "callbacks": {
       "log_evaluation": {
         "period": 100,
@@ -72,17 +76,17 @@
   "evaluate": {
     "accuracy": {},
     "precision": {
-      "additional": {
+      "params": {
         "average": "macro"
       }
     },
     "recall": {
-      "additional": {
+      "params": {
         "average": "macro"
       }
     },
     "f1": {
-      "additional": {
+      "params": {
         "average": "macro"
       }
     },

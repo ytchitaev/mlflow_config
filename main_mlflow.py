@@ -7,10 +7,13 @@ from utils.file_processor import load_json, get_relative_path
 from functions.run_manager import setup_experiment, finalise_run, log_run_outcome
 from stages.experiment_stages import *
 
-
 def main(cfg: dict):
-
+    
+    mlflow.autolog(log_models=True, exclusive=True)
+    mlflow.lightgbm.autolog()
+    mlflow.sklearn.autolog()
     setup_experiment(cfg)
+    
     with mlflow.start_run() as run:
 
         try:

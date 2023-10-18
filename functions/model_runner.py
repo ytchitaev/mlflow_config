@@ -6,19 +6,17 @@ import mlflow.lightgbm
 
 class LibraryImplementer(ABC):
     "abstract base class definition for model fit and model logging"
-    @abstractmethod
-    def log_model(self, model: Any, artifact_path: str) -> Any:
-        pass
 
     @abstractmethod
     def fit_model(self, cfg_model: dict, model: Any, X_train: Any, y_train: Any) -> Any:
         pass
 
+    @abstractmethod
+    def log_model(self, model: Any, artifact_path: str) -> Any:
+        pass
+
 
 class LightGBMLibraryImplementer(LibraryImplementer):
-    def log_model(self, model: Any, artifact_path: str) -> Any:
-        "lightgbm implementation of model logging"
-        return mlflow.lightgbm.log_model(model, artifact_path)
 
     def handle_callbacks(self, cfg_model: dict) -> List:
         "dynamically handle callbacks e.g. lightgbm.log_evaluation(period=100, show_stdv=True)"
@@ -38,18 +36,24 @@ class LightGBMLibraryImplementer(LibraryImplementer):
             callbacks.append(mlflow.lightgbm.callbacks.LGBMLogger())
         model.fit(X_train, y_train, callbacks=callbacks)
 
+    def log_model(self, model: Any, artifact_path: str) -> Any:
+        "lightgbm implementation of model logging"
+        return mlflow.lightgbm.log_model(model, artifact_path)
+
 
 class ModelManager:
     @staticmethod
     def fit_model(cfg_model: dict, model, X_train, y_train):
         library_name = cfg_model['library_name']
-        library_implementer = ModelManager._create_library_implementer(library_name)
+        library_implementer = ModelManager._create_library_implementer(
+            library_name)
         library_implementer.fit_model(cfg_model, model, X_train, y_train)
 
     @staticmethod
     def log_model(cfg_model: dict, model, artifact_path: str):
         library_name = cfg_model['library_name']
-        library_implementer = ModelManager._create_library_implementer(library_name)
+        library_implementer = ModelManager._create_library_implementer(
+            library_name)
         return library_implementer.log_model(model, artifact_path)
 
     @staticmethod

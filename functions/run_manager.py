@@ -39,11 +39,10 @@ def setup_experiment(cfg):
 def log_run_outcome(status, logger, exception:Exception=None, traceback:traceback=None):
     "log the outcome status and exception/traceback if any"
     mlflow.log_param("status", status)
+    logger.info(f"Status: {status}")
     if exception:
         logger.error(f"Exception occurred during model training: {str(exception)}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-    else:
-        logger.info(f"Model run completed.")
     pass
 
 
@@ -55,6 +54,9 @@ def finalise_run(cfg, logger, final_params, file_handler_path):
     logger.info(f"{'Model full path:' : <25} {get_config(cfg, 'execution.model_path')}")
     logger.info(f"{'Finished run:' : <25} {get_config(cfg, 'execution.experiment_run_path')}")
     write_last_config(cfg)
+
+    # disabled
     mlflow.log_params(final_params)
+
     mlflow.log_artifact(file_handler_path)
     pass

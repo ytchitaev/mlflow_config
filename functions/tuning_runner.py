@@ -45,15 +45,15 @@ class TuningMethod(ABC):
 
 
 # Implementations of different tuning methods
+@dataclass
 class GridSearchMethod(TuningMethod):
-    def __init__(self, param_grid: Dict[str, Any], cv: int, scoring: str, n_jobs: int, refit: bool, return_train_score: bool, verbose: bool):
-        self.param_grid = param_grid
-        self.cv = cv
-        self.scoring = scoring
-        self.n_jobs = n_jobs
-        self.refit = refit
-        self.return_train_score = return_train_score
-        self.verbose = verbose
+    param_grid: Dict[str, Any]
+    cv: int
+    scoring: str
+    n_jobs: int
+    refit: bool
+    return_train_score: bool
+    verbose: bool
 
     def perform_tuning(self, model: Any, X_train: pd.DataFrame, y_train: pd.Series, X_validation: pd.DataFrame, y_validation: pd.Series) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         grid_search = GridSearchCV(
@@ -72,13 +72,13 @@ class GridSearchMethod(TuningMethod):
         return TuningParams(grid_search.best_params_), TuningArtifacts(grid_search.cv_results_, best_estimator_evals_result)
 
 
+@dataclass
 class RandomSearchMethod(TuningMethod):
-    def __init__(self, param_dist: Dict[str, Any], n_iter: int, cv: int, refit: bool):
-        self.param_dist = param_dist
-        self.n_iter = n_iter
-        self.cv = cv
-        self.refit = refit
-
+    param_dist: Dict[str, Any]
+    n_iter: int
+    cv: int
+    refit: bool
+    
     def perform_tuning(self, model: Any, X_train: pd.DataFrame, y_train: pd.Series, X_validation: pd.DataFrame, y_validation: pd.Series) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         random_search = RandomizedSearchCV(
             model,

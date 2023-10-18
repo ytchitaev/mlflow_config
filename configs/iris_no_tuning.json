@@ -30,6 +30,9 @@
     "library_name": "lightgbm",
     "model_name": "LGBMClassifier",
     "params": {
+      "objective": "multiclass",
+      "num_class": 3,
+      "metric": "multi_logloss",
       "boosting_type": "gbdt",
       "num_leaves": 15,
       "learning_rate": 0.05,
@@ -45,17 +48,17 @@
   "evaluate": {
     "accuracy": {},
     "precision": {
-      "additional": {
+      "params": {
         "average": "macro"
       }
     },
     "recall": {
-      "additional": {
+      "params": {
         "average": "macro"
       }
     },
     "f1": {
-      "additional": {
+      "params": {
         "average": "macro"
       }
     },

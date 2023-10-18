@@ -1,6 +1,6 @@
 {
   "setup": {
-    "experiment_name": "Wine sklearn regression - tuning",
+    "experiment_name": "Wine sklearn regression - no tuning",
     "tags": {
       "environment": "production",
       "team": "data-science",
@@ -40,7 +40,11 @@
     "model_name": "LGBMRegressor",
     "params": {
       "objective": "regression",
-      "metric": "rmse"
+      "boosting_type": "gbdt",
+      "num_leaves": 20,
+      "learning_rate": 0.01,
+      "feature_fraction": 0.5,
+      "bagging_fraction": 0.5
     },
     "callbacks": {
       "log_evaluation": {
@@ -48,45 +52,5 @@
         "show_stdv": true
       }
     }
-  },
-  "tuning": {
-    "name": "grid_search",
-    "params": {
-      "param_grid": {
-        "boosting_type": [
-          "gbdt"
-        ],
-        "num_leaves": [
-          20,
-          30,
-          40
-        ],
-        "learning_rate": [
-          0.01,
-          0.05,
-          0.1
-        ],
-        "feature_fraction": [
-          0.5,
-          0.7,
-          0.9,
-          1.0
-        ],
-        "bagging_fraction": [
-          0.5,
-          0.7,
-          0.9
-        ]
-      },
-      "cv": 5,
-      "scoring": "neg_mean_squared_error",
-      "n_jobs": -1,
-      "refit": true,
-      "return_train_score": true,
-      "verbose": false
-    }
-  },
-  "evaluate": {
-    "rmse": {}
   }
 }
