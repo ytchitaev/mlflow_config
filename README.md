@@ -1,5 +1,13 @@
 # MLFlow Config Driven Framework
 
+## Status
+This project has been discontinued. The takeaway from this experiment was that there are limits to what can be practicality driven by configuration in the ML library space. 
+
+A more feasible approach would be to rely on templates / exemplars of python code for particular use cases rather than trying to wrap functionality in a config driven application interface.
+
+-------------
+
+## Overview
 This project provides a configurable and extensible framework for machine learning workflows using MLFlow, a platform for the complete machine learning lifecycle. The framework allows users to define the details of an experiment, such as the dataset to use, the machine learning model to train, and the evaluation metrics to compute, all via a configuration file. The project provides support for various data sources, machine learning libraries, and model architectures, and it incorporates unit tests to ensure code quality and functionality.
 
 ## Installation
